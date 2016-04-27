@@ -67,6 +67,7 @@
 
 #include "object.h"
 #include "objimpl.h"
+#if 0
 #include "typeslots.h"
 #include "pyhash.h"
 
@@ -131,5 +132,5 @@
 #include "dtoa.h"
 #include "fileutils.h"
 #include "pyfpe.h"
-
+#endif
 #endif /* !Py_PYTHON_H */

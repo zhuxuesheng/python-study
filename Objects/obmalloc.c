@@ -31,8 +31,6 @@ static void _PyMem_DebugCheckAddress(char api_id, const void *p);
  #endif
 #endif
 
-#ifdef WITH_PYMALLOC
-
 #ifdef MS_WINDOWS
 #  include <windows.h>
 #elif defined(HAVE_MMAP)
@@ -42,6 +40,7 @@ static void _PyMem_DebugCheckAddress(char api_id, const void *p);
 #  endif
 #endif
 
+#ifdef WITH_PYMALLOC
 /* Forward declaration */
 static void* _PyObject_Malloc(void *ctx, size_t size);
 static void* _PyObject_Calloc(void *ctx, size_t nelem, size_t elsize);
