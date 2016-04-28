@@ -67,18 +67,18 @@
 
 #include "object.h"
 #include "objimpl.h"
-#if 0
 #include "typeslots.h"
 #include "pyhash.h"
-
+#include "longobject.h"
+#include "longintrepr.h"
+#include "boolobject.h"
+#include "pyerrors.h"
+#if 0
 #include "pydebug.h"
 
 #include "bytearrayobject.h"
 #include "bytesobject.h"
 #include "unicodeobject.h"
-#include "longobject.h"
-#include "longintrepr.h"
-#include "boolobject.h"
 #include "floatobject.h"
 #include "complexobject.h"
 #include "rangeobject.h"
@@ -107,7 +107,6 @@
 #include "namespaceobject.h"
 
 #include "codecs.h"
-#include "pyerrors.h"
 
 #include "pystate.h"
 

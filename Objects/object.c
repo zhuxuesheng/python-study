@@ -278,8 +278,16 @@ _PyObject_NewVar(PyTypeObject *tp, Py_ssize_t nitems)
 }
 
 
+PyObject _Py_NoneStruct = {
+  _PyObject_EXTRA_INIT
+  1, 0
+};
 
 
+PyObject _Py_NotImplementedStruct = {
+    _PyObject_EXTRA_INIT
+    1, 0
+};
 #ifdef __cplusplus
 }
 #endif
