@@ -7,11 +7,17 @@ set HEAD_FOLDER=/I..\Include /I..\PC
 set CC=cl /Zi /w /c %MACRO_DEFINE% %HEAD_FOLDER%
 
 @echo on
+
+REM ** Object **
 %CC% ..\Objects\obmalloc.c
 %CC% ..\Objects\object.c
 %CC% ..\Objects\longobject.c
 %CC% ..\Objects\boolobject.c
 %CC% ..\Objects\floatobject.c
 %CC% ..\Objects\tupleobject.c
+
+REM ** Python **
+%CC% ..\Python\pyctype.c
+
 %CC% test.c
 link /out:test.exe /debug *.obj

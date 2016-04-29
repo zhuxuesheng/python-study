@@ -76,6 +76,7 @@
 #include "floatobject.h"
 #include "tupleobject.h"
 #include "pyfpe.h"
+#include "pyctype.h"
 
 #if 0
 #include "pydebug.h"
@@ -127,7 +128,7 @@
 #include "compile.h"
 #include "eval.h"
 
-#include "pyctype.h"
+
 #include "pystrtod.h"
 #include "pystrcmp.h"
 #include "dtoa.h"

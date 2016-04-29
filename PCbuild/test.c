@@ -126,11 +126,6 @@ PyErr_SetFromErrno(PyObject *exc)
     return 0;
 }
 
-int Py_ISSPACE(char c)
-{
-    return isspace(c);
-}
-
 PyObject *
 PyUnicode_FromStringAndSize(const char *u, Py_ssize_t size)
 {
