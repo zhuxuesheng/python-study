@@ -10,6 +10,7 @@ Py_FatalError(const char *msg)
 }
 
 extern PyNumberMethods long_as_number;
+extern PyNumberMethods bool_as_number;
 int main()
 {
     #ifdef _DEBUG
@@ -24,11 +25,18 @@ int main()
     
     PyLongObject *x, *y, *z;
     long result;
-    x = PyLong_FromLong(1);
-    y = PyLong_FromLong(2);
-    z = long_as_number.nb_add(x, y);
+    x = PyLong_FromLong(500);
+    y = PyLong_FromLong(60);
+    z = long_as_number.nb_multiply(x, y);
     result = PyLong_AsLong(z);
     printf("1+2=%d\n", result);
+    
+    PyObject *t, *f, *zz;
+    t = PyBool_FromLong(1);
+    f = PyBool_FromLong(0);
+    zz = bool_as_number.nb_and(x, y);
+    result = PyLong_AsLong(zz);
+    printf("True and False is %d\n", result);
     
     return 0;
 }

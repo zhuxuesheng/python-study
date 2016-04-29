@@ -2535,7 +2535,7 @@ long_add(PyLongObject *a, PyLongObject *b)
 {
     PyLongObject *z;
 
-    //CHECK_BINOP(a, b);
+    CHECK_BINOP(a, b);
 
     if (Py_ABS(Py_SIZE(a)) <= 1 && Py_ABS(Py_SIZE(b)) <= 1) {
         PyObject *result = PyLong_FromLong(MEDIUM_VALUE(a) +
