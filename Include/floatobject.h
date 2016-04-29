@@ -20,7 +20,7 @@ typedef struct {
 
 PyAPI_DATA(PyTypeObject) PyFloat_Type;
 
-#define PyFloat_Check(op) (1) //PyObject_TypeCheck(op, &PyFloat_Type)
+#define PyFloat_Check(op) PyObject_TypeCheck(op, &PyFloat_Type)
 #define PyFloat_CheckExact(op) (Py_TYPE(op) == &PyFloat_Type)
 
 #ifdef Py_NAN
@@ -50,8 +50,6 @@ PyAPI_FUNC(double) PyFloat_AsDouble(PyObject *);
 #ifndef Py_LIMITED_API
 #define PyFloat_AS_DOUBLE(op) (((PyFloatObject *)(op))->ob_fval)
 #endif
-
-
 
 #ifdef __cplusplus
 }

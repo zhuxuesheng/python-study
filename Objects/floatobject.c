@@ -139,7 +139,6 @@ convert_to_double(PyObject **v, double *dbl)
     return 0;
 }
 
-
 /* Comparison is pretty much a nightmare.  When comparing float to float,
  * we do it as straightforwardly (and long-windedly) as conceivable, so
  * that, e.g., Python x == y delivers the same result as the platform
@@ -486,8 +485,8 @@ float_floor_div(PyObject *v, PyObject *w)
     t = float_divmod(v, w);
     if (t == NULL || t == Py_NotImplemented)
         return t;
-    //assert(PyTuple_CheckExact(t));
-    //r = PyTuple_GET_ITEM(t, 0);
+    assert(PyTuple_CheckExact(t));
+    r = PyTuple_GET_ITEM(t, 0);
     Py_INCREF(r);
     Py_DECREF(t);
     return r;
@@ -932,7 +931,46 @@ PyNumberMethods float_as_number = {
     0,                  /* nb_inplace_true_divide */
 };
 
-PyTypeObject PyFloat_Type;
+PyTypeObject PyFloat_Type = {
+    PyVarObject_HEAD_INIT(&PyType_Type, 0)
+    "float",
+    sizeof(PyFloatObject),
+    0,
+    (destructor)float_dealloc,                  /* tp_dealloc */
+    0,                                          /* tp_print */
+    0,                                          /* tp_getattr */
+    0,                                          /* tp_setattr */
+    0,                                          /* tp_reserved */
+    0,                       /* tp_repr */
+    &float_as_number,                           /* tp_as_number */
+    0,                                          /* tp_as_sequence */
+    0,                                          /* tp_as_mapping */
+    0,                       /* tp_hash */
+    0,                                          /* tp_call */
+    0,                       /* tp_str */
+    0,                    /* tp_getattro */
+    0,                                          /* tp_setattro */
+    0,                                          /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /* tp_flags */
+    0,                                  /* tp_doc */
+    0,                                          /* tp_traverse */
+    0,                                          /* tp_clear */
+    0,                          /* tp_richcompare */
+    0,                                          /* tp_weaklistoffset */
+    0,                                          /* tp_iter */
+    0,                                          /* tp_iternext */
+    0,                              /* tp_methods */
+    0,                                          /* tp_members */
+    0,                               /* tp_getset */
+    0,                                          /* tp_base */
+    0,                                          /* tp_dict */
+    0,                                          /* tp_descr_get */
+    0,                                          /* tp_descr_set */
+    0,                                          /* tp_dictoffset */
+    0,                                          /* tp_init */
+    0,                                          /* tp_alloc */
+    0,                                  /* tp_new */
+};
 
 int
 _PyFloat_Init(void)

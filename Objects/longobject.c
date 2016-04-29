@@ -3444,7 +3444,7 @@ long_pow(PyObject *v, PyObject *w, PyObject *x)
                arguments to double. */
             Py_DECREF(a);
             Py_DECREF(b);
-            return NULL; //PyFloat_Type.tp_as_number->nb_power(v, w, x);
+            return PyFloat_Type.tp_as_number->nb_power(v, w, x);
         }
     }
 
@@ -4328,8 +4328,8 @@ _PyLong_DivmodNear(PyObject *a, PyObject *b)
         goto error;
 
     /* PyTuple_SET_ITEM steals references */
-    //PyTuple_SET_ITEM(result, 0, (PyObject *)quo);
-    //PyTuple_SET_ITEM(result, 1, (PyObject *)rem);
+    PyTuple_SET_ITEM(result, 0, (PyObject *)quo);
+    PyTuple_SET_ITEM(result, 1, (PyObject *)rem);
     Py_DECREF(one);
     return result;
 
@@ -4535,7 +4535,49 @@ PyNumberMethods long_as_number = {
     long_long,                  /* nb_index */
 };
 
-PyTypeObject PyLong_Type;
+PyTypeObject PyLong_Type = {
+    PyVarObject_HEAD_INIT(&PyType_Type, 0)
+    "int",                                      /* tp_name */
+    offsetof(PyLongObject, ob_digit),           /* tp_basicsize */
+    sizeof(digit),                              /* tp_itemsize */
+    long_dealloc,                               /* tp_dealloc */
+    0,                                          /* tp_print */
+    0,                                          /* tp_getattr */
+    0,                                          /* tp_setattr */
+    0,                                          /* tp_reserved */
+    0,                     /* tp_repr */
+    &long_as_number,                            /* tp_as_number */
+    0,                                          /* tp_as_sequence */
+    0,                                          /* tp_as_mapping */
+    0,                        /* tp_hash */
+    0,                                          /* tp_call */
+    0,                     /* tp_str */
+    0,                    /* tp_getattro */
+    0,                                          /* tp_setattro */
+    0,                                          /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE |
+        Py_TPFLAGS_LONG_SUBCLASS,               /* tp_flags */
+    0,                                   /* tp_doc */
+    0,                                          /* tp_traverse */
+    0,                                          /* tp_clear */
+    long_richcompare,                           /* tp_richcompare */
+    0,                                          /* tp_weaklistoffset */
+    0,                                          /* tp_iter */
+    0,                                          /* tp_iternext */
+    0,                               /* tp_methods */
+    0,                                          /* tp_members */
+    0,                                /* tp_getset */
+    0,                                          /* tp_base */
+    0,                                          /* tp_dict */
+    0,                                          /* tp_descr_get */
+    0,                                          /* tp_descr_set */
+    0,                                          /* tp_dictoffset */
+    0,                                          /* tp_init */
+    0,                                          /* tp_alloc */
+    0,                                   /* tp_new */
+    PyObject_Del,                               /* tp_free */
+};
+
 
 int
 _PyLong_Init(void)

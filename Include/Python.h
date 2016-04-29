@@ -74,7 +74,9 @@
 #include "boolobject.h"
 #include "pyerrors.h"
 #include "floatobject.h"
+#include "tupleobject.h"
 #include "pyfpe.h"
+
 #if 0
 #include "pydebug.h"
 
@@ -84,7 +86,6 @@
 #include "complexobject.h"
 #include "rangeobject.h"
 #include "memoryobject.h"
-#include "tupleobject.h"
 #include "listobject.h"
 #include "dictobject.h"
 #include "odictobject.h"

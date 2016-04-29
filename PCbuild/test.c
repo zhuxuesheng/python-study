@@ -29,16 +29,15 @@ int main()
     long result;
     x = PyLong_FromLong(500);
     y = PyLong_FromLong(60);
-    z = long_as_number.nb_multiply(x, y);
+    z = long_as_number.nb_remainder(x, y);
     result = PyLong_AsLong(z);
     printf("1+2=%d\n", result);
     
     PyObject *t, *f, *zz;
     t = PyBool_FromLong(1);
     f = PyBool_FromLong(0);
-    zz = bool_as_number.nb_and(x, y);
-    result = PyLong_AsLong(zz);
-    printf("True and False is %d\n", result);
+    zz = bool_as_number.nb_and(t, f);
+    printf("True and False is %s\n", (zz==Py_True)?("True"):("False"));
     
     PyObject *f1, *f2, *f3;
     f1 = PyFloat_FromDouble(10.5);
@@ -95,6 +94,7 @@ PyErr_WarnFormat(PyObject *category, Py_ssize_t stack_level,
 void
 PyErr_SetString(PyObject *exception, const char *string)
 {
+    printf("Error: %s\n", string);
 }
 
 void
@@ -137,23 +137,38 @@ PyUnicode_FromStringAndSize(const char *u, Py_ssize_t size)
     return NULL;
 }
 
-PyObject *
-PyTuple_New(Py_ssize_t size)
-{
-    return NULL;
-}
+PyObject *PyExc_OverflowError, *PyExc_TypeError, *PyExc_ValueError, *PyExc_ZeroDivisionError, *PyExc_DeprecationWarning;
+PyObject *PyExc_IndexError;
+
+PyTypeObject PyType_Type; // wait type module
 
 int
-PyTuple_SetItem(PyObject *op, Py_ssize_t i, PyObject *newitem)
+PyType_IsSubtype(PyTypeObject *a, PyTypeObject *b)
 {
-    return 0;
+    printf("PyType_IsSubtype is not implemented yet, always return 1 ...\n");
+    return 1;
 }
-
-PyObject *PyExc_OverflowError, *PyExc_TypeError, *PyExc_ValueError, *PyExc_ZeroDivisionError, *PyExc_DeprecationWarning;
 
 PyObject *
 Py_BuildValue(const char *format, ...)
 {
     printf("Py_BuildValue is not supported...\n");
     return NULL;
+}
+
+PyVarObject *
+_PyObject_GC_NewVar(PyTypeObject *tp, Py_ssize_t nitems)
+{
+    size_t size;
+    PyVarObject *op;
+
+    if (nitems < 0) {
+        PyErr_BadInternalCall();
+        return NULL;
+    }
+    size = _PyObject_VAR_SIZE(tp, nitems);
+    op = (PyVarObject *) PyObject_Malloc(size);
+    if (op != NULL)
+        op = PyObject_INIT_VAR(op, tp, nitems);
+    return op;
 }

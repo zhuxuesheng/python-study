@@ -6,7 +6,6 @@ extern "C" {
 
 
 
-
 /* Predefined exceptions */
 
 PyAPI_DATA(PyObject *) PyExc_BaseException;
@@ -86,7 +85,6 @@ PyAPI_DATA(PyObject *) PyExc_ImportWarning;
 PyAPI_DATA(PyObject *) PyExc_UnicodeWarning;
 PyAPI_DATA(PyObject *) PyExc_BytesWarning;
 PyAPI_DATA(PyObject *) PyExc_ResourceWarning;
-
 
 
 
