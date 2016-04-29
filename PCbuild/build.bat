@@ -11,4 +11,4 @@ set CC=cl /Zi /w /c %MACRO_DEFINE% %HEAD_FOLDER%
 %CC% ..\Objects\object.c
 %CC% ..\Objects\longobject.c
 %CC% test.c
-link /out:test.exe *.obj
+link /out:test.exe /debug *.obj

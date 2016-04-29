@@ -2535,7 +2535,7 @@ long_add(PyLongObject *a, PyLongObject *b)
 {
     PyLongObject *z;
 
-    CHECK_BINOP(a, b);
+    //CHECK_BINOP(a, b);
 
     if (Py_ABS(Py_SIZE(a)) <= 1 && Py_ABS(Py_SIZE(b)) <= 1) {
         PyObject *result = PyLong_FromLong(MEDIUM_VALUE(a) +
@@ -4498,7 +4498,7 @@ Base 0 means to interpret the base from the string as an integer literal.\n\
 >>> int('0b100', base=0)\n\
 4");
 
-static PyNumberMethods long_as_number = {
+PyNumberMethods long_as_number = {
     (binaryfunc)long_add,       /*nb_add*/
     (binaryfunc)long_sub,       /*nb_subtract*/
     (binaryfunc)long_mul,       /*nb_multiply*/

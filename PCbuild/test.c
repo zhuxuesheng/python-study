@@ -2,6 +2,14 @@
 #include <stdarg.h>
 #include <ctype.h>
 
+void
+Py_FatalError(const char *msg)
+{
+    fprintf(stderr, "FATAL ERROR: %s\n", msg);
+    exit(1);
+}
+
+extern PyNumberMethods long_as_number;
 int main()
 {
     #ifdef _DEBUG
@@ -10,6 +18,18 @@ int main()
     printf("Python version: %s, hex: %08X\n", PY_VERSION, PY_VERSION_HEX); //patchlevel.h
     void *ptr = PyMem_Malloc(1024);
     PyMem_Free(ptr);
+    
+    if (!_PyLong_Init())
+        Py_FatalError("Py_Initialize: can't init longs");
+    
+    PyLongObject *x, *y, *z;
+    long result;
+    x = PyLong_FromLong(1);
+    y = PyLong_FromLong(2);
+    z = long_as_number.nb_add(x, y);
+    result = PyLong_AsLong(z);
+    printf("1+2=%d\n", result);
+    
     return 0;
 }
 
