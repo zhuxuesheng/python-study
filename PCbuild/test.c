@@ -11,6 +11,8 @@ Py_FatalError(const char *msg)
 
 extern PyNumberMethods long_as_number;
 extern PyNumberMethods bool_as_number;
+extern PyNumberMethods float_as_number;
+
 int main()
 {
     #ifdef _DEBUG
@@ -23,7 +25,7 @@ int main()
     if (!_PyLong_Init())
         Py_FatalError("Py_Initialize: can't init longs");
     
-    PyLongObject *x, *y, *z;
+    PyObject *x, *y, *z;
     long result;
     x = PyLong_FromLong(500);
     y = PyLong_FromLong(60);
@@ -37,6 +39,13 @@ int main()
     zz = bool_as_number.nb_and(x, y);
     result = PyLong_AsLong(zz);
     printf("True and False is %d\n", result);
+    
+    PyObject *f1, *f2, *f3;
+    f1 = PyFloat_FromDouble(10.5);
+    f2 = PyFloat_FromDouble(15.4);
+    f3 = float_as_number.nb_multiply(f1, f2);
+    double d = PyFloat_AsDouble(f3);
+    printf("10.5*15.4 = %f\n", d);
     
     return 0;
 }
@@ -111,6 +120,12 @@ PyErr_BadArgument(void)
     return 0;
 }
 
+PyObject *
+PyErr_SetFromErrno(PyObject *exc)
+{
+    return 0;
+}
+
 int Py_ISSPACE(char c)
 {
     return isspace(c);
@@ -118,12 +133,6 @@ int Py_ISSPACE(char c)
 
 PyObject *
 PyUnicode_FromStringAndSize(const char *u, Py_ssize_t size)
-{
-    return NULL;
-}
-
-PyObject *
-PyFloat_FromDouble(double fval)
 {
     return NULL;
 }
@@ -142,3 +151,9 @@ PyTuple_SetItem(PyObject *op, Py_ssize_t i, PyObject *newitem)
 
 PyObject *PyExc_OverflowError, *PyExc_TypeError, *PyExc_ValueError, *PyExc_ZeroDivisionError, *PyExc_DeprecationWarning;
 
+PyObject *
+Py_BuildValue(const char *format, ...)
+{
+    printf("Py_BuildValue is not supported...\n");
+    return NULL;
+}

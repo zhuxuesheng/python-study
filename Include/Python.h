@@ -73,13 +73,14 @@
 #include "longintrepr.h"
 #include "boolobject.h"
 #include "pyerrors.h"
+#include "floatobject.h"
+#include "pyfpe.h"
 #if 0
 #include "pydebug.h"
 
 #include "bytearrayobject.h"
 #include "bytesobject.h"
 #include "unicodeobject.h"
-#include "floatobject.h"
 #include "complexobject.h"
 #include "rangeobject.h"
 #include "memoryobject.h"
@@ -130,6 +131,6 @@
 #include "pystrcmp.h"
 #include "dtoa.h"
 #include "fileutils.h"
-#include "pyfpe.h"
+
 #endif
 #endif /* !Py_PYTHON_H */

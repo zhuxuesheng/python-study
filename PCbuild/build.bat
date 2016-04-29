@@ -11,5 +11,6 @@ set CC=cl /Zi /w /c %MACRO_DEFINE% %HEAD_FOLDER%
 %CC% ..\Objects\object.c
 %CC% ..\Objects\longobject.c
 %CC% ..\Objects\boolobject.c
+%CC% ..\Objects\floatobject.c
 %CC% test.c
 link /out:test.exe /debug *.obj
