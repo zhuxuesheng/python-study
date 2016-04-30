@@ -135,7 +135,7 @@ PyUnicode_FromStringAndSize(const char *u, Py_ssize_t size)
 }
 
 PyObject *PyExc_OverflowError, *PyExc_TypeError, *PyExc_ValueError, *PyExc_ZeroDivisionError, *PyExc_DeprecationWarning;
-PyObject *PyExc_IndexError, *PyExc_SystemError;
+PyObject *PyExc_IndexError, *PyExc_SystemError, *PyExc_BufferError;
 
 PyTypeObject PyType_Type; // wait type module
 
@@ -168,4 +168,38 @@ _PyObject_GC_NewVar(PyTypeObject *tp, Py_ssize_t nitems)
     if (op != NULL)
         op = PyObject_INIT_VAR(op, tp, nitems);
     return op;
+}
+
+int
+PyObject_GetBuffer(PyObject *obj, Py_buffer *view, int flags)
+{
+    PyBufferProcs *pb = obj->ob_type->tp_as_buffer;
+
+    if (pb == NULL || pb->bf_getbuffer == NULL) {
+        PyErr_Format(PyExc_TypeError,
+                     "a bytes-like object is required, not '%.100s'",
+                     Py_TYPE(obj)->tp_name);
+        return -1;
+    }
+    return (*pb->bf_getbuffer)(obj, view, flags);
+}
+
+void
+PyBuffer_Release(Py_buffer *view)
+{
+    PyObject *obj = view->obj;
+    PyBufferProcs *pb;
+    if (obj == NULL)
+        return;
+    pb = Py_TYPE(obj)->tp_as_buffer;
+    if (pb && pb->bf_releasebuffer)
+        pb->bf_releasebuffer(obj, view);
+    view->obj = NULL;
+    Py_DECREF(obj);
+}
+
+PyObject *
+PyObject_CallFunctionObjArgs(PyObject *callable, ...)
+{
+    return NULL;
 }

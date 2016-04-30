@@ -69,23 +69,24 @@
 #include "objimpl.h"
 #include "typeslots.h"
 #include "pyhash.h"
-#include "longobject.h"
-#include "longintrepr.h"
-#include "boolobject.h"
-#include "pyerrors.h"
-#include "floatobject.h"
-#include "tupleobject.h"
-#include "pyfpe.h"
-#include "pyctype.h"
-#include "bytesobject.h"
-//#include "pystrtod.h"
-//#include "codecs.h"
-#if 0
+
 #include "pydebug.h"
 
 #include "bytearrayobject.h"
+#include "bytesobject.h"
+//#include "unicodeobject.h"
+#include "longobject.h"
+#include "longintrepr.h"
+#include "boolobject.h"
+#include "floatobject.h"
+#include "tupleobject.h"
 
-#include "unicodeobject.h"
+#include "pyerrors.h"
+
+#include "pyfpe.h"
+#include "pyctype.h"
+
+#if 0
 #include "complexobject.h"
 #include "rangeobject.h"
 #include "memoryobject.h"
