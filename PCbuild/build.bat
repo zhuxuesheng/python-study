@@ -18,6 +18,7 @@ REM ** Object **
 %CC% ..\Objects\bytesobject.c
 %CC% ..\Objects\bytearrayobject.c
 %CC% ..\Objects\complexobject.c
+%CC% ..\Objects\listobject.c
 
 REM ** Python **
 %CC% ..\Python\pyctype.c

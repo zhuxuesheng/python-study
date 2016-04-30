@@ -82,9 +82,10 @@
 #include "complexobject.h"
 #include "tupleobject.h"
 #include "methodobject.h"
-
+#include "listobject.h"
 #include "pyerrors.h"
-
+#include "abstract.h"
+#include "ceval.h"
 #include "pyfpe.h"
 #include "pyctype.h"
 
@@ -92,7 +93,7 @@
 
 #include "rangeobject.h"
 #include "memoryobject.h"
-#include "listobject.h"
+
 #include "dictobject.h"
 #include "odictobject.h"
 #include "enumobject.h"
@@ -122,12 +123,11 @@
 #include "modsupport.h"
 #include "pythonrun.h"
 #include "pylifecycle.h"
-#include "ceval.h"
+
 #include "sysmodule.h"
 #include "intrcheck.h"
 #include "import.h"
 
-#include "abstract.h"
 #include "bltinmodule.h"
 
 #include "compile.h"

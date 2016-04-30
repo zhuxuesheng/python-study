@@ -124,6 +124,21 @@ PyErr_SetFromErrno(PyObject *exc)
     return 0;
 }
 
+void
+PyErr_SetObject(PyObject *exception, PyObject *value)
+{
+}
+
+int
+PyErr_ExceptionMatches(PyObject *exc)
+{
+}
+
+void
+PyErr_Clear(void)
+{
+}
+
 PyObject *
 PyUnicode_FromString(const char *u)
 {
@@ -137,9 +152,10 @@ PyUnicode_FromStringAndSize(const char *u, Py_ssize_t size)
 }
 
 PyObject *PyExc_OverflowError, *PyExc_TypeError, *PyExc_ValueError, *PyExc_ZeroDivisionError, *PyExc_DeprecationWarning;
-PyObject *PyExc_IndexError, *PyExc_SystemError, *PyExc_BufferError;
+PyObject *PyExc_IndexError, *PyExc_SystemError, *PyExc_BufferError, *PyExc_StopIteration;
 
 PyTypeObject PyType_Type; // wait type module
+PyGC_Head *_PyGC_generation0;
 
 int
 PyType_IsSubtype(PyTypeObject *a, PyTypeObject *b)
@@ -149,10 +165,46 @@ PyType_IsSubtype(PyTypeObject *a, PyTypeObject *b)
 }
 
 PyObject *
+PyType_GenericAlloc(PyTypeObject *type, Py_ssize_t nitems)
+{
+}
+
+PyObject *
+PyType_GenericNew(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    return type->tp_alloc(type, 0);
+}
+
+PyObject *
 Py_BuildValue(const char *format, ...)
 {
     printf("Py_BuildValue is not supported...\n");
     return NULL;
+}
+
+void
+PyObject_GC_Track(void *op)
+{
+    _PyObject_GC_TRACK(op);
+}
+
+void
+PyObject_GC_UnTrack(void *op)
+{
+    /* Obscure:  the Py_TRASHCAN mechanism requires that we be able to
+     * call PyObject_GC_UnTrack twice on an object.
+     */
+    //if (IS_TRACKED(op))
+        _PyObject_GC_UNTRACK(op);
+}
+
+PyObject *
+_PyObject_GC_New(PyTypeObject *tp)
+{
+    PyObject *op = PyObject_Malloc(_PyObject_SIZE(tp));
+    if (op != NULL)
+        op = PyObject_INIT(op, tp);
+    return op;
 }
 
 PyVarObject *
@@ -170,6 +222,12 @@ _PyObject_GC_NewVar(PyTypeObject *tp, Py_ssize_t nitems)
     if (op != NULL)
         op = PyObject_INIT_VAR(op, tp, nitems);
     return op;
+}
+
+void
+PyObject_GC_Del(void *op)
+{
+    PyObject_FREE(op);
 }
 
 int
@@ -212,8 +270,57 @@ _PyObject_LookupSpecial(PyObject *self, _Py_Identifier *attrid)
     return NULL;
 }
 
+PyObject *
+PyObject_GetIter(PyObject *o)
+{    
+}
+
+Py_ssize_t
+PyObject_LengthHint(PyObject *o, Py_ssize_t defaultvalue)
+{
+}
+
 Py_ssize_t
 PyDict_Size(PyObject *mp)
 {
     return -1;
+}
+
+PyObject *
+PySequence_Fast(PyObject *v, const char *m)
+{
+}
+
+Py_ssize_t
+PyNumber_AsSsize_t(PyObject *item, PyObject *err)
+{
+}
+
+int
+PyArg_ParseTuple(PyObject *args, const char *format, ...)
+{
+}
+
+int
+PyArg_ParseTupleAndKeywords(PyObject *args,
+                            PyObject *keywords,
+                            const char *format,
+                            char **kwlist, ...)
+{
+}
+
+int PySlice_Check(PyObject *x)
+{
+    return 0;
+}
+int
+PySlice_GetIndicesEx(PyObject *_r, Py_ssize_t length,
+                     Py_ssize_t *start, Py_ssize_t *stop, Py_ssize_t *step,
+                     Py_ssize_t *slicelength)
+{
+}
+
+int
+_PyEval_SliceIndex(PyObject *v, Py_ssize_t *pi)
+{
 }

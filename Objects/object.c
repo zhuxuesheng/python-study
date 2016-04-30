@@ -277,7 +277,6 @@ _PyObject_NewVar(PyTypeObject *tp, Py_ssize_t nitems)
     return PyObject_INIT_VAR(op, tp, nitems);
 }
 
-
 /* Perform a rich comparison with object result.  This wraps do_richcompare()
    with a check for NULL arguments and a recursion check. */
 
@@ -286,6 +285,247 @@ PyObject_RichCompare(PyObject *v, PyObject *w, int op)
 {
     return NULL;
 }
+/* Perform a rich comparison with integer result.  This wraps
+   PyObject_RichCompare(), returning -1 for error, 0 for false, 1 for true. */
+int
+PyObject_RichCompareBool(PyObject *v, PyObject *w, int op)
+{
+    return 0;
+}
+
+Py_hash_t
+PyObject_HashNotImplemented(PyObject *v)
+{
+    PyErr_Format(PyExc_TypeError, "unhashable type: '%.200s'",
+                 Py_TYPE(v)->tp_name);
+    return -1;
+}
+
+Py_hash_t
+PyObject_Hash(PyObject *v)
+{
+    /* Otherwise, the object can't be hashed */
+    return PyObject_HashNotImplemented(v);
+}
+
+PyObject *
+PyObject_GetAttrString(PyObject *v, const char *name)
+{
+    return NULL;
+}
+
+int
+PyObject_HasAttrString(PyObject *v, const char *name)
+{
+    PyObject *res = PyObject_GetAttrString(v, name);
+    if (res != NULL) {
+        Py_DECREF(res);
+        return 1;
+    }
+    PyErr_Clear();
+    return 0;
+}
+
+int
+PyObject_SetAttrString(PyObject *v, const char *name, PyObject *w)
+{
+    return -1;
+}
+
+int
+_PyObject_IsAbstract(PyObject *obj)
+{
+    return -1;
+}
+
+PyObject *
+_PyObject_GetAttrId(PyObject *v, _Py_Identifier *name)
+{
+    return NULL;
+}
+
+int
+_PyObject_HasAttrId(PyObject *v, _Py_Identifier *name)
+{
+    return -1;
+}
+
+int
+_PyObject_SetAttrId(PyObject *v, _Py_Identifier *name, PyObject *w)
+{
+    return -1;
+}
+
+PyObject *
+PyObject_GetAttr(PyObject *v, PyObject *name)
+{
+    return NULL;
+}
+
+int
+PyObject_HasAttr(PyObject *v, PyObject *name)
+{
+    PyObject *res = PyObject_GetAttr(v, name);
+    if (res != NULL) {
+        Py_DECREF(res);
+        return 1;
+    }
+    PyErr_Clear();
+    return 0;
+}
+
+int
+PyObject_SetAttr(PyObject *v, PyObject *name, PyObject *value)
+{
+    return -1;
+}
+
+/* Helper to get a pointer to an object's __dict__ slot, if any */
+
+PyObject **
+_PyObject_GetDictPtr(PyObject *obj)
+{
+    return NULL;
+}
+
+PyObject *
+PyObject_SelfIter(PyObject *obj)
+{
+    Py_INCREF(obj);
+    return obj;
+}
+
+/* Convenience function to get a builtin from its name */
+PyObject *
+_PyObject_GetBuiltin(const char *name)
+{
+    return NULL;
+}
+
+/* Helper used when the __next__ method is removed from a type:
+   tp_iternext is never NULL and can be safely called without checking
+   on every iteration.
+ */
+
+PyObject *
+_PyObject_NextNotImplemented(PyObject *self)
+{
+    PyErr_Format(PyExc_TypeError,
+                 "'%.200s' object is not iterable",
+                 Py_TYPE(self)->tp_name);
+    return NULL;
+}
+
+/* Generic GetAttr functions - put these in your tp_[gs]etattro slot */
+
+PyObject *
+_PyObject_GenericGetAttrWithDict(PyObject *obj, PyObject *name, PyObject *dict)
+{
+    return NULL;
+}
+
+PyObject *
+PyObject_GenericGetAttr(PyObject *obj, PyObject *name)
+{
+    return _PyObject_GenericGetAttrWithDict(obj, name, NULL);
+}
+
+int
+_PyObject_GenericSetAttrWithDict(PyObject *obj, PyObject *name,
+                                 PyObject *value, PyObject *dict)
+{
+    return -1;
+}
+
+int
+PyObject_GenericSetAttr(PyObject *obj, PyObject *name, PyObject *value)
+{
+    return _PyObject_GenericSetAttrWithDict(obj, name, value, NULL);
+}
+
+int
+PyObject_GenericSetDict(PyObject *obj, PyObject *value, void *context)
+{
+    return 0;
+}
+
+
+/* Test a value used as condition, e.g., in a for or if statement.
+   Return -1 if an error occurred */
+
+int
+PyObject_IsTrue(PyObject *v)
+{
+    Py_ssize_t res;
+    if (v == Py_True)
+        return 1;
+    if (v == Py_False)
+        return 0;
+    if (v == Py_None)
+        return 0;
+    else if (v->ob_type->tp_as_number != NULL &&
+             v->ob_type->tp_as_number->nb_bool != NULL)
+        res = (*v->ob_type->tp_as_number->nb_bool)(v);
+    else if (v->ob_type->tp_as_mapping != NULL &&
+             v->ob_type->tp_as_mapping->mp_length != NULL)
+        res = (*v->ob_type->tp_as_mapping->mp_length)(v);
+    else if (v->ob_type->tp_as_sequence != NULL &&
+             v->ob_type->tp_as_sequence->sq_length != NULL)
+        res = (*v->ob_type->tp_as_sequence->sq_length)(v);
+    else
+        return 1;
+    /* if it is negative, it should be either -1 or -2 */
+    return (res > 0) ? 1 : Py_SAFE_DOWNCAST(res, Py_ssize_t, int);
+}
+
+/* equivalent of 'not v'
+   Return -1 if an error occurred */
+
+int
+PyObject_Not(PyObject *v)
+{
+    int res;
+    res = PyObject_IsTrue(v);
+    if (res < 0)
+        return res;
+    return res == 0;
+}
+
+/* Test whether an object can be called */
+
+int
+PyCallable_Check(PyObject *x)
+{
+    if (x == NULL)
+        return 0;
+    return x->ob_type->tp_call != NULL;
+}
+
+
+/* Helper for PyObject_Dir without arguments: returns the local scope. */
+static PyObject *
+_dir_locals(void)
+{
+    return NULL;
+}
+
+/* Helper for PyObject_Dir: object introspection. */
+static PyObject *
+_dir_object(PyObject *obj)
+{
+    return NULL;
+}
+
+/* Implementation of dir() -- if obj is NULL, returns the names in the current
+   (local) scope.  Otherwise, performs introspection of the object: returns a
+   sorted list of attribute names (supposedly) accessible from the object
+*/
+PyObject *
+PyObject_Dir(PyObject *obj)
+{
+    return (obj == NULL) ? _dir_locals() : _dir_object(obj);
+}
+
 /*
 None is a non-NULL undefined value.
 There is (and should be!) no way to create other objects of this type,
