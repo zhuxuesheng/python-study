@@ -271,7 +271,7 @@ try_complex_special_method(PyObject *op) {
     PyObject *f;
     _Py_IDENTIFIER(__complex__);
 
-    f = 0; //_PyObject_LookupSpecial(op, &PyId___complex__);
+    f = _PyObject_LookupSpecial(op, &PyId___complex__);
     if (f) {
         PyObject *res = PyObject_CallFunctionObjArgs(f, NULL);
         Py_DECREF(f);
@@ -327,7 +327,6 @@ complex_dealloc(PyObject *op)
 {
     op->ob_type->tp_free(op);
 }
-
 
 /* This macro may return! */
 #define TO_COMPLEX(obj, c) \
@@ -547,7 +546,7 @@ complex_richcompare(PyObject *v, PyObject *w, int op)
             if (j == NULL)
                 return NULL;
 
-            sub_res = NULL; //PyObject_RichCompare(j, w, op);
+            sub_res = PyObject_RichCompare(j, w, op);
             Py_DECREF(j);
             return sub_res;
         }

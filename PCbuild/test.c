@@ -9,10 +9,6 @@ Py_FatalError(const char *msg)
     exit(1);
 }
 
-extern PyNumberMethods long_as_number;
-extern PyNumberMethods bool_as_number;
-extern PyNumberMethods float_as_number;
-
 const char *Py_hexdigits = "0123456789abcdef";
 
 int main()
@@ -31,20 +27,20 @@ int main()
     long result;
     x = PyLong_FromLong(500);
     y = PyLong_FromLong(60);
-    z = long_as_number.nb_remainder(x, y);
+    z = PyLong_Type.tp_as_number->nb_remainder(x, y);
     result = PyLong_AsLong(z);
     printf("1+2=%d\n", result);
     
     PyObject *t, *f, *zz;
     t = PyBool_FromLong(1);
     f = PyBool_FromLong(0);
-    zz = bool_as_number.nb_and(t, f);
+    zz = PyBool_Type.tp_as_number->nb_and(t, f);
     printf("True and False is %s\n", (zz==Py_True)?("True"):("False"));
     
     PyObject *f1, *f2, *f3;
     f1 = PyFloat_FromDouble(10.5);
     f2 = PyFloat_FromDouble(15.4);
-    f3 = float_as_number.nb_multiply(f1, f2);
+    f3 = PyFloat_Type.tp_as_number->nb_multiply(f1, f2);
     double d = PyFloat_AsDouble(f3);
     printf("10.5*15.4 = %f\n", d);
     
@@ -129,6 +125,12 @@ PyErr_SetFromErrno(PyObject *exc)
 }
 
 PyObject *
+PyUnicode_FromString(const char *u)
+{
+    return NULL;
+}
+
+PyObject *
 PyUnicode_FromStringAndSize(const char *u, Py_ssize_t size)
 {
     return NULL;
@@ -202,4 +204,16 @@ PyObject *
 PyObject_CallFunctionObjArgs(PyObject *callable, ...)
 {
     return NULL;
+}
+
+PyObject *
+_PyObject_LookupSpecial(PyObject *self, _Py_Identifier *attrid)
+{
+    return NULL;
+}
+
+Py_ssize_t
+PyDict_Size(PyObject *mp)
+{
+    return -1;
 }

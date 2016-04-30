@@ -94,6 +94,11 @@ PyAPI_FUNC(PY_LONG_LONG) PyLong_AsLongLongAndOverflow(PyObject *, int *);
 #endif /* HAVE_LONG_LONG */
 
 PyAPI_FUNC(PyObject *) PyLong_FromString(const char *, char **, int);
+#ifndef Py_LIMITED_API
+PyAPI_FUNC(PyObject *) PyLong_FromUnicode(Py_UNICODE*, Py_ssize_t, int);
+PyAPI_FUNC(PyObject *) PyLong_FromUnicodeObject(PyObject *u, int base);
+PyAPI_FUNC(PyObject *) _PyLong_FromBytes(const char *, Py_ssize_t, int);
+#endif
 
 #ifndef Py_LIMITED_API
 /* _PyLong_Sign.  Return 0 if v is 0, -1 if v < 0, +1 if v > 0.
@@ -171,6 +176,20 @@ PyAPI_FUNC(PyLongObject *)_PyLong_FromNbInt(PyObject *);
    appending a base prefix of 0[box] if base is 2, 8 or 16. */
 PyAPI_FUNC(PyObject *) _PyLong_Format(PyObject *obj, int base);
 
+PyAPI_FUNC(int) _PyLong_FormatWriter(
+    _PyUnicodeWriter *writer,
+    PyObject *obj,
+    int base,
+    int alternate);
+
+/* Format the object based on the format_spec, as defined in PEP 3101
+   (Advanced String Formatting). */
+PyAPI_FUNC(int) _PyLong_FormatAdvancedWriter(
+    _PyUnicodeWriter *writer,
+    PyObject *obj,
+    PyObject *format_spec,
+    Py_ssize_t start,
+    Py_ssize_t end);
 #endif /* Py_LIMITED_API */
 
 /* These aren't really part of the int object, but they're handy. The

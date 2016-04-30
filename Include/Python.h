@@ -74,13 +74,14 @@
 
 #include "bytearrayobject.h"
 #include "bytesobject.h"
-//#include "unicodeobject.h"
+#include "unicodeobject.h"
 #include "longobject.h"
 #include "longintrepr.h"
 #include "boolobject.h"
 #include "floatobject.h"
 #include "complexobject.h"
 #include "tupleobject.h"
+#include "methodobject.h"
 
 #include "pyerrors.h"
 
@@ -96,7 +97,7 @@
 #include "odictobject.h"
 #include "enumobject.h"
 #include "setobject.h"
-#include "methodobject.h"
+
 #include "moduleobject.h"
 #include "funcobject.h"
 #include "classobject.h"

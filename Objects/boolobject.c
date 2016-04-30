@@ -8,6 +8,10 @@
 static PyObject *false_str = NULL;
 static PyObject *true_str = NULL;
 
+static PyObject *
+bool_repr(PyObject *self)
+{
+}
 
 /* Function to return a bool from a C long */
 
@@ -23,6 +27,12 @@ PyObject *PyBool_FromLong(long ok)
     return result;
 }
 
+/* We define bool_new to always return either Py_True or Py_False */
+
+static PyObject *
+bool_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+}
 
 /* Arithmetic operations redefined to return bool if both args are bool. */
 
@@ -61,7 +71,7 @@ The class bool is a subclass of the class int, and cannot be subclassed.");
 
 /* Arithmetic methods -- only so we can override &, |, ^. */
 
-PyNumberMethods bool_as_number = {
+static PyNumberMethods bool_as_number = {
     0,                          /* nb_add */
     0,                          /* nb_subtract */
     0,                          /* nb_multiply */
@@ -110,18 +120,18 @@ PyTypeObject PyBool_Type = {
     0,                                          /* tp_getattr */
     0,                                          /* tp_setattr */
     0,                                          /* tp_reserved */
-    0,                                  /* tp_repr */
+    bool_repr,                                  /* tp_repr */
     &bool_as_number,                            /* tp_as_number */
     0,                                          /* tp_as_sequence */
     0,                                          /* tp_as_mapping */
     0,                                          /* tp_hash */
     0,                                          /* tp_call */
-    0,                                  /* tp_str */
+    bool_repr,                                  /* tp_str */
     0,                                          /* tp_getattro */
     0,                                          /* tp_setattro */
     0,                                          /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT,                         /* tp_flags */
-    0,                                   /* tp_doc */
+    bool_doc,                                   /* tp_doc */
     0,                                          /* tp_traverse */
     0,                                          /* tp_clear */
     0,                                          /* tp_richcompare */
@@ -138,7 +148,7 @@ PyTypeObject PyBool_Type = {
     0,                                          /* tp_dictoffset */
     0,                                          /* tp_init */
     0,                                          /* tp_alloc */
-    0,                                   /* tp_new */
+    bool_new,                                   /* tp_new */
 };
 
 /* The objects representing bool values False and True */

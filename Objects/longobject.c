@@ -4498,7 +4498,7 @@ Base 0 means to interpret the base from the string as an integer literal.\n\
 >>> int('0b100', base=0)\n\
 4");
 
-PyNumberMethods long_as_number = {
+static PyNumberMethods long_as_number = {
     (binaryfunc)long_add,       /*nb_add*/
     (binaryfunc)long_sub,       /*nb_subtract*/
     (binaryfunc)long_mul,       /*nb_multiply*/

@@ -278,6 +278,47 @@ _PyObject_NewVar(PyTypeObject *tp, Py_ssize_t nitems)
 }
 
 
+/* Perform a rich comparison with object result.  This wraps do_richcompare()
+   with a check for NULL arguments and a recursion check. */
+
+PyObject *
+PyObject_RichCompare(PyObject *v, PyObject *w, int op)
+{
+    return NULL;
+}
+/*
+None is a non-NULL undefined value.
+There is (and should be!) no way to create other objects of this type,
+so there is exactly one (which is indestructible, by the way).
+*/
+
+/* ARGSUSED */
+static PyObject *
+none_repr(PyObject *op)
+{
+    return PyUnicode_FromString("None");
+}
+
+/* ARGUSED */
+static void
+none_dealloc(PyObject* ignore)
+{
+    /* This should never get called, but we also don't want to SEGV if
+     * we accidentally decref None out of existence.
+     */
+    Py_FatalError("deallocating None");
+}
+
+static PyObject *
+none_new(PyTypeObject *type, PyObject *args, PyObject *kwargs)
+{
+    if (PyTuple_GET_SIZE(args) || (kwargs && PyDict_Size(kwargs))) {
+        PyErr_SetString(PyExc_TypeError, "NoneType takes no arguments");
+        return NULL;
+    }
+    Py_RETURN_NONE;
+}
+
 static int
 none_bool(PyObject *v)
 {
@@ -326,12 +367,12 @@ PyTypeObject _PyNone_Type = {
     "NoneType",
     0,
     0,
-    0,       /*tp_dealloc*/ /*never called*/
+    none_dealloc,       /*tp_dealloc*/ /*never called*/
     0,                  /*tp_print*/
     0,                  /*tp_getattr*/
     0,                  /*tp_setattr*/
     0,                  /*tp_reserved*/
-    0,          /*tp_repr*/
+    none_repr,          /*tp_repr*/
     &none_as_number,    /*tp_as_number*/
     0,                  /*tp_as_sequence*/
     0,                  /*tp_as_mapping*/
@@ -359,24 +400,64 @@ PyTypeObject _PyNone_Type = {
     0,                  /*tp_dictoffset */
     0,                  /*tp_init */
     0,                  /*tp_alloc */
-    0,           /*tp_new */
+    none_new,           /*tp_new */
 };
 
 PyObject _Py_NoneStruct = {
   _PyObject_EXTRA_INIT
   1, &_PyNone_Type
 };
+
+/* NotImplemented is an object that can be used to signal that an
+   operation is not implemented for the given type combination. */
+
+static PyObject *
+NotImplemented_repr(PyObject *op)
+{
+    return PyUnicode_FromString("NotImplemented");
+}
+
+static PyObject *
+NotImplemented_reduce(PyObject *op)
+{
+    return PyUnicode_FromString("NotImplemented");
+}
+
+static PyMethodDef notimplemented_methods[] = {
+    {"__reduce__", (PyCFunction)NotImplemented_reduce, METH_NOARGS, NULL},
+    {NULL, NULL}
+};
+
+static PyObject *
+notimplemented_new(PyTypeObject *type, PyObject *args, PyObject *kwargs)
+{
+    if (PyTuple_GET_SIZE(args) || (kwargs && PyDict_Size(kwargs))) {
+        PyErr_SetString(PyExc_TypeError, "NotImplementedType takes no arguments");
+        return NULL;
+    }
+    Py_RETURN_NOTIMPLEMENTED;
+}
+
+static void
+notimplemented_dealloc(PyObject* ignore)
+{
+    /* This should never get called, but we also don't want to SEGV if
+     * we accidentally decref NotImplemented out of existence.
+     */
+    Py_FatalError("deallocating NotImplemented");
+}
+
 PyTypeObject _PyNotImplemented_Type = {
     PyVarObject_HEAD_INIT(&PyType_Type, 0)
     "NotImplementedType",
     0,
     0,
-    0,       /*tp_dealloc*/ /*never called*/
+    notimplemented_dealloc,       /*tp_dealloc*/ /*never called*/
     0,                  /*tp_print*/
     0,                  /*tp_getattr*/
     0,                  /*tp_setattr*/
     0,                  /*tp_reserved*/
-    0, /*tp_repr*/
+    NotImplemented_repr, /*tp_repr*/
     0,                  /*tp_as_number*/
     0,                  /*tp_as_sequence*/
     0,                  /*tp_as_mapping*/
@@ -394,7 +475,7 @@ PyTypeObject _PyNotImplemented_Type = {
     0,                  /*tp_weaklistoffset */
     0,                  /*tp_iter */
     0,                  /*tp_iternext */
-    0, /*tp_methods */
+    notimplemented_methods, /*tp_methods */
     0,                  /*tp_members */
     0,                  /*tp_getset */
     0,                  /*tp_base */
@@ -404,7 +485,7 @@ PyTypeObject _PyNotImplemented_Type = {
     0,                  /*tp_dictoffset */
     0,                  /*tp_init */
     0,                  /*tp_alloc */
-    0, /*tp_new */
+    notimplemented_new, /*tp_new */
 };
 
 PyObject _Py_NotImplementedStruct = {
