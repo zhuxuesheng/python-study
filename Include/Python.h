@@ -79,6 +79,7 @@
 #include "longintrepr.h"
 #include "boolobject.h"
 #include "floatobject.h"
+#include "complexobject.h"
 #include "tupleobject.h"
 
 #include "pyerrors.h"
@@ -87,7 +88,7 @@
 #include "pyctype.h"
 
 #if 0
-#include "complexobject.h"
+
 #include "rangeobject.h"
 #include "memoryobject.h"
 #include "listobject.h"
