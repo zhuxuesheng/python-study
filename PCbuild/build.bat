@@ -15,6 +15,7 @@ REM ** Object **
 %CC% ..\Objects\boolobject.c
 %CC% ..\Objects\floatobject.c
 %CC% ..\Objects\tupleobject.c
+%CC% ..\Objects\bytesobject.c
 
 REM ** Python **
 %CC% ..\Python\pyctype.c

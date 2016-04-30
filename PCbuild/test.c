@@ -13,6 +13,8 @@ extern PyNumberMethods long_as_number;
 extern PyNumberMethods bool_as_number;
 extern PyNumberMethods float_as_number;
 
+const char *Py_hexdigits = "0123456789abcdef";
+
 int main()
 {
     #ifdef _DEBUG
@@ -133,7 +135,7 @@ PyUnicode_FromStringAndSize(const char *u, Py_ssize_t size)
 }
 
 PyObject *PyExc_OverflowError, *PyExc_TypeError, *PyExc_ValueError, *PyExc_ZeroDivisionError, *PyExc_DeprecationWarning;
-PyObject *PyExc_IndexError;
+PyObject *PyExc_IndexError, *PyExc_SystemError;
 
 PyTypeObject PyType_Type; // wait type module
 

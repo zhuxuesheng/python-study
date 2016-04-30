@@ -77,12 +77,14 @@
 #include "tupleobject.h"
 #include "pyfpe.h"
 #include "pyctype.h"
-
+#include "bytesobject.h"
+//#include "pystrtod.h"
+//#include "codecs.h"
 #if 0
 #include "pydebug.h"
 
 #include "bytearrayobject.h"
-#include "bytesobject.h"
+
 #include "unicodeobject.h"
 #include "complexobject.h"
 #include "rangeobject.h"
@@ -109,7 +111,7 @@
 #include "structseq.h"
 #include "namespaceobject.h"
 
-#include "codecs.h"
+
 
 #include "pystate.h"
 
@@ -129,7 +131,7 @@
 #include "eval.h"
 
 
-#include "pystrtod.h"
+
 #include "pystrcmp.h"
 #include "dtoa.h"
 #include "fileutils.h"
