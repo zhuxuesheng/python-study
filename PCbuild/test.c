@@ -112,6 +112,16 @@ PyErr_CheckSignals(void)
     return 0;
 }
 
+void
+_PyErr_SetKeyError(PyObject *arg)
+{
+}
+
+void
+_PyErr_ChainExceptions(PyObject *exc, PyObject *val, PyObject *tb)
+{
+}
+
 int
 PyErr_BadArgument(void)
 {
@@ -141,6 +151,11 @@ PyErr_GivenExceptionMatches(PyObject *err, PyObject *exc)
 }
 
 void
+PyErr_Fetch(PyObject **p_type, PyObject **p_value, PyObject **p_traceback)
+{
+}
+
+void
 PyErr_Clear(void)
 {
 }
@@ -163,7 +178,8 @@ PyUnicode_FromStringAndSize(const char *u, Py_ssize_t size)
 }
 
 PyObject *PyExc_OverflowError, *PyExc_TypeError, *PyExc_ValueError, *PyExc_ZeroDivisionError, *PyExc_DeprecationWarning;
-PyObject *PyExc_IndexError, *PyExc_SystemError, *PyExc_BufferError, *PyExc_StopIteration;
+PyObject *PyExc_IndexError, *PyExc_SystemError, *PyExc_BufferError, *PyExc_StopIteration, *PyExc_AttributeError;
+PyObject *PyExc_KeyError, *PyExc_MemoryError, *PyExc_RuntimeError;
 
 PyTypeObject PyType_Type; // wait type module
 PyGC_Head *_PyGC_generation0;
@@ -252,12 +268,6 @@ _PyObject_LookupSpecial(PyObject *self, _Py_Identifier *attrid)
     return NULL;
 }
 
-Py_ssize_t
-PyDict_Size(PyObject *mp)
-{
-    return -1;
-}
-
 int
 PyArg_ParseTuple(PyObject *args, const char *format, ...)
 {
@@ -268,6 +278,16 @@ PyArg_ParseTupleAndKeywords(PyObject *args,
                             PyObject *keywords,
                             const char *format,
                             char **kwlist, ...)
+{
+}
+
+int
+PyArg_UnpackTuple(PyObject *args, const char *name, Py_ssize_t min, Py_ssize_t max, ...)
+{
+}
+
+int
+PyArg_ValidateKeywordArguments(PyObject *kwargs)
 {
 }
 
@@ -295,5 +315,55 @@ _PyEval_SliceIndex(PyObject *v, Py_ssize_t *pi)
 
 PyObject *
 PyEval_CallObjectWithKeywords(PyObject *func, PyObject *arg, PyObject *kw)
+{
+}
+
+PyObject *
+Py_VaBuildValue(const char *format, va_list va)
+{
+}
+
+PyObject *
+_Py_VaBuildValue_SizeT(const char *format, va_list va)
+{
+}
+
+PyObject *
+PySeqIter_New(PyObject *seq)
+{
+}
+
+PyTypeObject PyUnicode_Type;
+
+int
+_PyUnicode_Ready(PyObject *unicode)
+{
+}
+
+PyObject *
+PyUnicode_FromFormat(const char *format, ...)
+{
+}
+
+void
+PyUnicode_InternInPlace(PyObject **p)
+{
+}
+
+PyObject *
+_PyUnicode_FromId(_Py_Identifier *id)
+{
+}
+
+PyTypeObject PySet_Type, PyFrozenSet_Type;
+
+int
+_PySet_NextEntry(PyObject *set, Py_ssize_t *pos, PyObject **key, Py_hash_t *hash)
+{
+    return -1;
+}
+
+PyObject *
+PySet_New(PyObject *iterable)
 {
 }

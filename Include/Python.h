@@ -82,6 +82,8 @@
 #include "complexobject.h"
 #include "tupleobject.h"
 #include "listobject.h"
+#include "dictobject.h"
+#include "setobject.h"
 
 #include "methodobject.h"
 #include "pyerrors.h"
@@ -95,10 +97,8 @@
 #include "rangeobject.h"
 #include "memoryobject.h"
 
-#include "dictobject.h"
 #include "odictobject.h"
 #include "enumobject.h"
-#include "setobject.h"
 #include "moduleobject.h"
 #include "funcobject.h"
 #include "classobject.h"

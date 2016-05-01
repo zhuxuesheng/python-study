@@ -169,6 +169,56 @@ PyTuple_SetItem(PyObject *op, Py_ssize_t i, PyObject *newitem)
     return 0;
 }
 
+void
+_PyTuple_MaybeUntrack(PyObject *op)
+{
+    PyTupleObject *t;
+    Py_ssize_t i, n;
+
+    if (!PyTuple_CheckExact(op) || !_PyObject_GC_IS_TRACKED(op))
+        return;
+    t = (PyTupleObject *) op;
+    n = Py_SIZE(t);
+    for (i = 0; i < n; i++) {
+        PyObject *elt = PyTuple_GET_ITEM(t, i);
+        /* Tuple with NULL elements aren't
+           fully constructed, don't untrack
+           them yet. */
+        if (!elt ||
+            _PyObject_GC_MAY_BE_TRACKED(elt))
+            return;
+    }
+#ifdef SHOW_TRACK_COUNT
+    count_tracked--;
+    count_untracked++;
+#endif
+    _PyObject_GC_UNTRACK(op);
+}
+
+PyObject *
+PyTuple_Pack(Py_ssize_t n, ...)
+{
+    Py_ssize_t i;
+    PyObject *o;
+    PyObject *result;
+    PyObject **items;
+    va_list vargs;
+
+    va_start(vargs, n);
+    result = PyTuple_New(n);
+    if (result == NULL) {
+        va_end(vargs);
+        return NULL;
+    }
+    items = ((PyTupleObject *)result)->ob_item;
+    for (i = 0; i < n; i++) {
+        o = va_arg(vargs, PyObject *);
+        Py_INCREF(o);
+        items[i] = o;
+    }
+    va_end(vargs);
+    return result;
+}
 PyTypeObject PyTuple_Type = {
     PyVarObject_HEAD_INIT(&PyType_Type, 0)
     "tuple",

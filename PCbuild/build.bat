@@ -19,6 +19,7 @@ REM ** Object **
 %CC% ..\Objects\bytearrayobject.c
 %CC% ..\Objects\complexobject.c
 %CC% ..\Objects\listobject.c
+%CC% ..\Objects\dictobject.c
 %CC% ..\Objects\abstract.c
 
 REM ** Python **
