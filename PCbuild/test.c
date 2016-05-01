@@ -134,8 +134,19 @@ PyErr_ExceptionMatches(PyObject *exc)
 {
 }
 
+int
+PyErr_GivenExceptionMatches(PyObject *err, PyObject *exc)
+{
+    return err == exc;
+}
+
 void
 PyErr_Clear(void)
+{
+}
+
+PyObject *
+PyUnicode_New(Py_ssize_t size, Py_UCS4 maxchar)
 {
 }
 
@@ -230,38 +241,9 @@ PyObject_GC_Del(void *op)
     PyObject_FREE(op);
 }
 
-int
-PyObject_GetBuffer(PyObject *obj, Py_buffer *view, int flags)
+PyVarObject *
+_PyObject_GC_Resize(PyVarObject *op, Py_ssize_t nitems)
 {
-    PyBufferProcs *pb = obj->ob_type->tp_as_buffer;
-
-    if (pb == NULL || pb->bf_getbuffer == NULL) {
-        PyErr_Format(PyExc_TypeError,
-                     "a bytes-like object is required, not '%.100s'",
-                     Py_TYPE(obj)->tp_name);
-        return -1;
-    }
-    return (*pb->bf_getbuffer)(obj, view, flags);
-}
-
-void
-PyBuffer_Release(Py_buffer *view)
-{
-    PyObject *obj = view->obj;
-    PyBufferProcs *pb;
-    if (obj == NULL)
-        return;
-    pb = Py_TYPE(obj)->tp_as_buffer;
-    if (pb && pb->bf_releasebuffer)
-        pb->bf_releasebuffer(obj, view);
-    view->obj = NULL;
-    Py_DECREF(obj);
-}
-
-PyObject *
-PyObject_CallFunctionObjArgs(PyObject *callable, ...)
-{
-    return NULL;
 }
 
 PyObject *
@@ -270,30 +252,10 @@ _PyObject_LookupSpecial(PyObject *self, _Py_Identifier *attrid)
     return NULL;
 }
 
-PyObject *
-PyObject_GetIter(PyObject *o)
-{    
-}
-
-Py_ssize_t
-PyObject_LengthHint(PyObject *o, Py_ssize_t defaultvalue)
-{
-}
-
 Py_ssize_t
 PyDict_Size(PyObject *mp)
 {
     return -1;
-}
-
-PyObject *
-PySequence_Fast(PyObject *v, const char *m)
-{
-}
-
-Py_ssize_t
-PyNumber_AsSsize_t(PyObject *item, PyObject *err)
-{
 }
 
 int
@@ -309,10 +271,16 @@ PyArg_ParseTupleAndKeywords(PyObject *args,
 {
 }
 
+PyObject *
+_PySlice_FromIndices(Py_ssize_t istart, Py_ssize_t istop)
+{
+}
+
 int PySlice_Check(PyObject *x)
 {
     return 0;
 }
+
 int
 PySlice_GetIndicesEx(PyObject *_r, Py_ssize_t length,
                      Py_ssize_t *start, Py_ssize_t *stop, Py_ssize_t *step,
@@ -322,5 +290,10 @@ PySlice_GetIndicesEx(PyObject *_r, Py_ssize_t length,
 
 int
 _PyEval_SliceIndex(PyObject *v, Py_ssize_t *pi)
+{
+}
+
+PyObject *
+PyEval_CallObjectWithKeywords(PyObject *func, PyObject *arg, PyObject *kw)
 {
 }

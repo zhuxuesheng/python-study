@@ -52,6 +52,11 @@ PyFloat_FromDouble(double fval)
     return (PyObject *) op;
 }
 
+PyObject *
+PyFloat_FromString(PyObject *v)
+{
+    return NULL;
+}
 
 static void
 float_dealloc(PyFloatObject *op)
@@ -137,6 +142,12 @@ convert_to_double(PyObject **v, double *dbl)
         return -1;
     }
     return 0;
+}
+
+static PyObject *
+float_repr(PyFloatObject *v)
+{
+    return NULL;
 }
 
 /* Comparison is pretty much a nightmare.  When comparing float to float,
@@ -570,7 +581,7 @@ float_pow(PyObject *v, PyObject *w, PyObject *z)
             /* Negative numbers raised to fractional powers
              * become complex.
              */
-            return NULL; //PyComplex_Type.tp_as_number->nb_power(v, w, z);
+            return PyComplex_Type.tp_as_number->nb_power(v, w, z);
         }
         /* iw is an exact integer, albeit perhaps a very large
          * one.  Replace iv by its absolute value and remember

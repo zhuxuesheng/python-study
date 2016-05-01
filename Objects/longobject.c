@@ -1575,6 +1575,63 @@ divrem1(PyLongObject *a, digit n, digit *prem)
     return long_normalize(z);
 }
 
+/* Convert an integer to a base 10 string.  Returns a new non-shared
+   string.  (Return value is non-shared so that callers can modify the
+   returned value if necessary.) */
+
+static int
+long_to_decimal_string_internal(PyObject *aa,
+                                PyObject **p_output,
+                                _PyUnicodeWriter *writer)
+{
+    return -1;
+}
+
+static PyObject *
+long_to_decimal_string(PyObject *aa)
+{
+    PyObject *v;
+    if (long_to_decimal_string_internal(aa, &v, NULL) == -1)
+        return NULL;
+    return v;
+}
+
+/* Convert an int object to a string, using a given conversion base,
+   which should be one of 2, 8 or 16.  Return a string object.
+   If base is 2, 8 or 16, add the proper prefix '0b', '0o' or '0x'
+   if alternate is nonzero. */
+
+static int
+long_format_binary(PyObject *aa, int base, int alternate,
+                   PyObject **p_output, _PyUnicodeWriter *writer)
+{
+    return -1;
+}
+
+PyObject *
+_PyLong_Format(PyObject *obj, int base)
+{
+    PyObject *str;
+    int err;
+    if (base == 10)
+        err = long_to_decimal_string_internal(obj, &str, NULL);
+    else
+        err = long_format_binary(obj, base, 1, &str, NULL);
+    if (err == -1)
+        return NULL;
+    return str;
+}
+
+int
+_PyLong_FormatWriter(_PyUnicodeWriter *writer,
+                     PyObject *obj,
+                     int base, int alternate)
+{
+    if (base == 10)
+        return long_to_decimal_string_internal(obj, NULL, writer);
+    else
+        return long_format_binary(obj, base, alternate, NULL, writer);
+}
 
 /* Table of digit values for 8-bit string -> integer conversion.
  * '0' maps to 0, ..., '9' maps to 9.
@@ -1961,6 +2018,42 @@ digit beyond the first.
     return NULL;
 }
 
+/* Since PyLong_FromString doesn't have a length parameter,
+ * check here for possible NULs in the string.
+ *
+ * Reports an invalid literal as a bytes object.
+ */
+PyObject *
+_PyLong_FromBytes(const char *s, Py_ssize_t len, int base)
+{
+    PyObject *result, *strobj;
+    char *end = NULL;
+
+    result = PyLong_FromString(s, &end, base);
+    if (end == NULL || (result != NULL && end == s + len))
+        return result;
+    Py_XDECREF(result);
+    strobj = PyBytes_FromStringAndSize(s, Py_MIN(len, 200));
+    if (strobj != NULL) {
+        PyErr_Format(PyExc_ValueError,
+                     "invalid literal for int() with base %d: %.200R",
+                     base, strobj);
+        Py_DECREF(strobj);
+    }
+    return NULL;
+}
+
+PyObject *
+PyLong_FromUnicode(Py_UNICODE *u, Py_ssize_t length, int base)
+{
+    return NULL;
+}
+
+PyObject *
+PyLong_FromUnicodeObject(PyObject *u, int base)
+{
+    return NULL;
+}
 
 /* forward */
 static PyLongObject *x_divrem
@@ -4481,6 +4574,91 @@ Number of bits necessary to represent self in binary.\n\
 >>> (37).bit_length()\n\
 6");
 
+#if 0
+static PyObject *
+long_is_finite(PyObject *v)
+{
+    Py_RETURN_TRUE;
+}
+#endif
+
+
+static PyObject *
+long_to_bytes(PyLongObject *v, PyObject *args, PyObject *kwds)
+{
+    return NULL;
+}
+
+PyDoc_STRVAR(long_to_bytes_doc,
+"int.to_bytes(length, byteorder, *, signed=False) -> bytes\n\
+\n\
+Return an array of bytes representing an integer.\n\
+\n\
+The integer is represented using length bytes.  An OverflowError is\n\
+raised if the integer is not representable with the given number of\n\
+bytes.\n\
+\n\
+The byteorder argument determines the byte order used to represent the\n\
+integer.  If byteorder is 'big', the most significant byte is at the\n\
+beginning of the byte array.  If byteorder is 'little', the most\n\
+significant byte is at the end of the byte array.  To request the native\n\
+byte order of the host system, use `sys.byteorder' as the byte order value.\n\
+\n\
+The signed keyword-only argument determines whether two's complement is\n\
+used to represent the integer.  If signed is False and a negative integer\n\
+is given, an OverflowError is raised.");
+
+static PyObject *
+long_from_bytes(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    return NULL;
+}
+
+PyDoc_STRVAR(long_from_bytes_doc,
+"int.from_bytes(bytes, byteorder, *, signed=False) -> int\n\
+\n\
+Return the integer represented by the given array of bytes.\n\
+\n\
+The bytes argument must be a bytes-like object (e.g. bytes or bytearray).\n\
+\n\
+The byteorder argument determines the byte order used to represent the\n\
+integer.  If byteorder is 'big', the most significant byte is at the\n\
+beginning of the byte array.  If byteorder is 'little', the most\n\
+significant byte is at the end of the byte array.  To request the native\n\
+byte order of the host system, use `sys.byteorder' as the byte order value.\n\
+\n\
+The signed keyword-only argument indicates whether two's complement is\n\
+used to represent the integer.");
+
+static PyMethodDef long_methods[] = {
+    {"conjugate",       (PyCFunction)long_long, METH_NOARGS,
+     "Returns self, the complex conjugate of any int."},
+    {"bit_length",      (PyCFunction)long_bit_length, METH_NOARGS,
+     long_bit_length_doc},
+#if 0
+    {"is_finite",       (PyCFunction)long_is_finite,    METH_NOARGS,
+     "Returns always True."},
+#endif
+    {"to_bytes",        (PyCFunction)long_to_bytes,
+     METH_VARARGS|METH_KEYWORDS, long_to_bytes_doc},
+    {"from_bytes",      (PyCFunction)long_from_bytes,
+     METH_VARARGS|METH_KEYWORDS|METH_CLASS, long_from_bytes_doc},
+    {"__trunc__",       (PyCFunction)long_long, METH_NOARGS,
+     "Truncating an Integral returns itself."},
+    {"__floor__",       (PyCFunction)long_long, METH_NOARGS,
+     "Flooring an Integral returns itself."},
+    {"__ceil__",        (PyCFunction)long_long, METH_NOARGS,
+     "Ceiling of an Integral returns itself."},
+    {"__round__",       (PyCFunction)long_round, METH_VARARGS,
+     "Rounding an Integral returns itself.\n"
+     "Rounding with an ndigits argument also returns an integer."},
+    {"__getnewargs__",          (PyCFunction)long_getnewargs,   METH_NOARGS},
+    {"__format__", (PyCFunction)long__format__, METH_VARARGS},
+    {"__sizeof__",      (PyCFunction)long_sizeof, METH_NOARGS,
+     "Returns size in memory, in bytes"},
+    {NULL,              NULL}           /* sentinel */
+};
+
 
 PyDoc_STRVAR(long_doc,
 "int(x=0) -> integer\n\
@@ -4545,26 +4723,26 @@ PyTypeObject PyLong_Type = {
     0,                                          /* tp_getattr */
     0,                                          /* tp_setattr */
     0,                                          /* tp_reserved */
-    0,                     /* tp_repr */
+    long_to_decimal_string,                     /* tp_repr */
     &long_as_number,                            /* tp_as_number */
     0,                                          /* tp_as_sequence */
     0,                                          /* tp_as_mapping */
-    0,                        /* tp_hash */
+    (hashfunc)long_hash,                        /* tp_hash */
     0,                                          /* tp_call */
-    0,                     /* tp_str */
-    0,                    /* tp_getattro */
+    long_to_decimal_string,                     /* tp_str */
+    PyObject_GenericGetAttr,                    /* tp_getattro */
     0,                                          /* tp_setattro */
     0,                                          /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE |
         Py_TPFLAGS_LONG_SUBCLASS,               /* tp_flags */
-    0,                                   /* tp_doc */
+    long_doc,                                   /* tp_doc */
     0,                                          /* tp_traverse */
     0,                                          /* tp_clear */
     long_richcompare,                           /* tp_richcompare */
     0,                                          /* tp_weaklistoffset */
     0,                                          /* tp_iter */
     0,                                          /* tp_iternext */
-    0,                               /* tp_methods */
+    long_methods,                               /* tp_methods */
     0,                                          /* tp_members */
     0,                                /* tp_getset */
     0,                                          /* tp_base */
@@ -4574,7 +4752,7 @@ PyTypeObject PyLong_Type = {
     0,                                          /* tp_dictoffset */
     0,                                          /* tp_init */
     0,                                          /* tp_alloc */
-    0,                                   /* tp_new */
+    long_new,                                   /* tp_new */
     PyObject_Del,                               /* tp_free */
 };
 

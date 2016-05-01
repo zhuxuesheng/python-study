@@ -210,3 +210,103 @@ PyTypeObject PyTuple_Type = {
     0,                                  /* tp_new */
     PyObject_Del,                            /* tp_free */
 };
+
+/* The following function breaks the notion that tuples are immutable:
+   it changes the size of a tuple.  We get away with this only if there
+   is only one module referencing the object.  You can also think of it
+   as creating a new tuple object and destroying the old one, only more
+   efficiently.  In any case, don't use this if the tuple may already be
+   known to some other part of the code. */
+
+int
+_PyTuple_Resize(PyObject **pv, Py_ssize_t newsize)
+{
+    PyTupleObject *v;
+    PyTupleObject *sv;
+    Py_ssize_t i;
+    Py_ssize_t oldsize;
+
+    v = (PyTupleObject *) *pv;
+    if (v == NULL || Py_TYPE(v) != &PyTuple_Type ||
+        (Py_SIZE(v) != 0 && Py_REFCNT(v) != 1)) {
+        *pv = 0;
+        Py_XDECREF(v);
+        PyErr_BadInternalCall();
+        return -1;
+    }
+    oldsize = Py_SIZE(v);
+    if (oldsize == newsize)
+        return 0;
+
+    if (oldsize == 0) {
+        /* Empty tuples are often shared, so we should never
+           resize them in-place even if we do own the only
+           (current) reference */
+        Py_DECREF(v);
+        *pv = PyTuple_New(newsize);
+        return *pv == NULL ? -1 : 0;
+    }
+
+    /* XXX UNREF/NEWREF interface should be more symmetrical */
+    _Py_DEC_REFTOTAL;
+    if (_PyObject_GC_IS_TRACKED(v))
+        _PyObject_GC_UNTRACK(v);
+    _Py_ForgetReference((PyObject *) v);
+    /* DECREF items deleted by shrinkage */
+    for (i = newsize; i < oldsize; i++) {
+        Py_CLEAR(v->ob_item[i]);
+    }
+    sv = PyObject_GC_Resize(PyTupleObject, v, newsize);
+    if (sv == NULL) {
+        *pv = NULL;
+        PyObject_GC_Del(v);
+        return -1;
+    }
+    _Py_NewReference((PyObject *) sv);
+    /* Zero out items added by growing */
+    if (newsize > oldsize)
+        memset(&sv->ob_item[oldsize], 0,
+               sizeof(*sv->ob_item) * (newsize - oldsize));
+    *pv = (PyObject *) sv;
+    _PyObject_GC_TRACK(sv);
+    return 0;
+}
+
+int
+PyTuple_ClearFreeList(void)
+{
+    int freelist_size = 0;
+#if PyTuple_MAXSAVESIZE > 0
+    int i;
+    for (i = 1; i < PyTuple_MAXSAVESIZE; i++) {
+        PyTupleObject *p, *q;
+        p = free_list[i];
+        freelist_size += numfree[i];
+        free_list[i] = NULL;
+        numfree[i] = 0;
+        while (p) {
+            q = p;
+            p = (PyTupleObject *)(p->ob_item[0]);
+            PyObject_GC_Del(q);
+        }
+    }
+#endif
+    return freelist_size;
+}
+
+void
+PyTuple_Fini(void)
+{
+#if PyTuple_MAXSAVESIZE > 0
+    /* empty tuples are used all over the place and applications may
+     * rely on the fact that an empty tuple is a singleton. */
+    Py_CLEAR(free_list[0]);
+
+    (void)PyTuple_ClearFreeList();
+#endif
+#ifdef SHOW_TRACK_COUNT
+    show_track();
+#endif
+}
+
+/*********************** Tuple Iterator **************************/
