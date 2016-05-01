@@ -11,6 +11,16 @@ static PyObject *true_str = NULL;
 static PyObject *
 bool_repr(PyObject *self)
 {
+    PyObject *s;
+
+    if (self == Py_True)
+        s = true_str ? true_str :
+            (true_str = PyUnicode_InternFromString("True"));
+    else
+        s = false_str ? false_str :
+            (false_str = PyUnicode_InternFromString("False"));
+    Py_XINCREF(s);
+    return s;
 }
 
 /* Function to return a bool from a C long */
@@ -32,6 +42,16 @@ PyObject *PyBool_FromLong(long ok)
 static PyObject *
 bool_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
+    static char *kwlist[] = {"x", 0};
+    PyObject *x = Py_False;
+    long ok;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O:bool", kwlist, &x))
+        return NULL;
+    ok = PyObject_IsTrue(x);
+    if (ok < 0)
+        return NULL;
+    return PyBool_FromLong(ok);
 }
 
 /* Arithmetic operations redefined to return bool if both args are bool. */

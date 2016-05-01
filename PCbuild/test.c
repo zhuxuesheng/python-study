@@ -296,14 +296,12 @@ _PyArg_NoKeywords(const char *funcname, PyObject *kw)
 {
 }
 
+PyTypeObject PySlice_Type;
+PyObject _Py_EllipsisObject;
+
 PyObject *
 _PySlice_FromIndices(Py_ssize_t istart, Py_ssize_t istop)
 {
-}
-
-int PySlice_Check(PyObject *x)
-{
-    return 0;
 }
 
 int
@@ -320,6 +318,11 @@ _PyEval_SliceIndex(PyObject *v, Py_ssize_t *pi)
 
 PyObject *
 PyEval_CallObjectWithKeywords(PyObject *func, PyObject *arg, PyObject *kw)
+{
+}
+
+PyObject *
+PyEval_GetLocals(void)
 {
 }
 
@@ -370,6 +373,63 @@ PyUnicode_AsASCIIString(PyObject *unicode)
 {
 }
 
+PyObject *
+PyUnicode_InternFromString(const char *cp)
+{
+}
+
+void
+_PyUnicodeWriter_Init(_PyUnicodeWriter *writer)
+{
+}
+
+PyObject *
+_PyUnicodeWriter_Finish(_PyUnicodeWriter *writer)
+{
+}
+
+void
+_PyUnicodeWriter_Dealloc(_PyUnicodeWriter *writer)
+{
+    Py_CLEAR(writer->buffer);
+}
+
+int
+_PyUnicodeWriter_WriteChar(_PyUnicodeWriter *writer, Py_UCS4 ch)
+{
+}
+
+int
+_PyUnicodeWriter_WriteStr(_PyUnicodeWriter *writer, PyObject *str)
+{
+}
+
+int
+_PyUnicodeWriter_WriteASCIIString(_PyUnicodeWriter *writer,
+                                  const char *ascii, Py_ssize_t len)
+{
+}
+
+char*
+PyUnicode_AsUTF8(PyObject *unicode)
+{
+}
+
+char*
+PyUnicode_AsUTF8AndSize(PyObject *unicode, Py_ssize_t *psize)
+{
+}
+
+PyObject *
+_PyUnicode_TransformDecimalAndSpaceToASCII(PyObject *unicode)
+{
+}
+
+PyObject*
+_PyUnicode_FromASCII(const char *buffer, Py_ssize_t size)
+{
+}
+
 void
 PyObject_ClearWeakRefs(PyObject *object)
 {
@@ -382,5 +442,54 @@ _Py_strhex(const char* argbuf, const Py_ssize_t arglen)
 
 PyObject *
 PyImport_ImportModule(const char *name)
+{
+}
+
+PyObject *
+PyImport_Import(PyObject *module_name)
+{
+}
+
+int
+_PyComplex_FormatAdvancedWriter(_PyUnicodeWriter *writer,
+                                PyObject *obj,
+                                PyObject *format_spec,
+                                Py_ssize_t start, Py_ssize_t end)
+{
+}
+
+int
+_PyLong_FormatAdvancedWriter(_PyUnicodeWriter *writer,
+                             PyObject *obj,
+                             PyObject *format_spec,
+                             Py_ssize_t start, Py_ssize_t end)
+{
+}
+
+int
+_PyFloat_FormatAdvancedWriter(_PyUnicodeWriter *writer,
+                              PyObject *obj,
+                              PyObject *format_spec,
+                              Py_ssize_t start, Py_ssize_t end)
+{
+}
+
+PyObject *
+PyStructSequence_New(PyTypeObject *type)
+{
+}
+
+int
+PyStructSequence_InitType2(PyTypeObject *type, PyStructSequence_Desc *desc)
+{
+}
+
+int
+PyType_Ready(PyTypeObject *type)
+{
+}
+
+PyObject *
+_PyType_Lookup(PyTypeObject *type, PyObject *name)
 {
 }

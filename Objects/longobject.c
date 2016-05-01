@@ -4334,6 +4334,23 @@ long_get1(PyLongObject *v, void *context) {
 static PyObject *
 long__format__(PyObject *self, PyObject *args)
 {
+    PyObject *format_spec;
+    _PyUnicodeWriter writer;
+    int ret;
+
+    if (!PyArg_ParseTuple(args, "U:__format__", &format_spec))
+        return NULL;
+
+    _PyUnicodeWriter_Init(&writer);
+    ret = _PyLong_FormatAdvancedWriter(
+        &writer,
+        self,
+        format_spec, 0, PyUnicode_GET_LENGTH(format_spec));
+    if (ret == -1) {
+        _PyUnicodeWriter_Dealloc(&writer);
+        return NULL;
+    }
+    return _PyUnicodeWriter_Finish(&writer);
 }
 
 /* Return a pair (q, r) such that a = b * q + r, and
@@ -4659,6 +4676,25 @@ static PyMethodDef long_methods[] = {
     {NULL,              NULL}           /* sentinel */
 };
 
+static PyGetSetDef long_getset[] = {
+    {"real",
+     (getter)long_long, (setter)NULL,
+     "the real part of a complex number",
+     NULL},
+    {"imag",
+     (getter)long_get0, (setter)NULL,
+     "the imaginary part of a complex number",
+     NULL},
+    {"numerator",
+     (getter)long_long, (setter)NULL,
+     "the numerator of a rational number in lowest terms",
+     NULL},
+    {"denominator",
+     (getter)long_get1, (setter)NULL,
+     "the denominator of a rational number in lowest terms",
+     NULL},
+    {NULL}  /* Sentinel */
+};
 
 PyDoc_STRVAR(long_doc,
 "int(x=0) -> integer\n\
@@ -4744,7 +4780,7 @@ PyTypeObject PyLong_Type = {
     0,                                          /* tp_iternext */
     long_methods,                               /* tp_methods */
     0,                                          /* tp_members */
-    0,                                /* tp_getset */
+    long_getset,                                /* tp_getset */
     0,                                          /* tp_base */
     0,                                          /* tp_dict */
     0,                                          /* tp_descr_get */
@@ -4756,6 +4792,45 @@ PyTypeObject PyLong_Type = {
     PyObject_Del,                               /* tp_free */
 };
 
+static PyTypeObject Int_InfoType;
+
+PyDoc_STRVAR(int_info__doc__,
+"sys.int_info\n\
+\n\
+A struct sequence that holds information about Python's\n\
+internal representation of integers.  The attributes are read only.");
+
+static PyStructSequence_Field int_info_fields[] = {
+    {"bits_per_digit", "size of a digit in bits"},
+    {"sizeof_digit", "size in bytes of the C type used to represent a digit"},
+    {NULL, NULL}
+};
+
+static PyStructSequence_Desc int_info_desc = {
+    "sys.int_info",   /* name */
+    int_info__doc__,  /* doc */
+    int_info_fields,  /* fields */
+    2                 /* number of fields */
+};
+
+PyObject *
+PyLong_GetInfo(void)
+{
+    PyObject* int_info;
+    int field = 0;
+    int_info = PyStructSequence_New(&Int_InfoType);
+    if (int_info == NULL)
+        return NULL;
+    PyStructSequence_SET_ITEM(int_info, field++,
+                              PyLong_FromLong(PyLong_SHIFT));
+    PyStructSequence_SET_ITEM(int_info, field++,
+                              PyLong_FromLong(sizeof(digit)));
+    if (PyErr_Occurred()) {
+        Py_CLEAR(int_info);
+        return NULL;
+    }
+    return int_info;
+}
 
 int
 _PyLong_Init(void)
@@ -4789,6 +4864,11 @@ _PyLong_Init(void)
         v->ob_digit[0] = (digit)abs(ival);
     }
 #endif
+    /* initialize int_info */
+    if (Int_InfoType.tp_name == NULL) {
+        if (PyStructSequence_InitType2(&Int_InfoType, &int_info_desc) < 0)
+            return 0;
+    }
 
     return 1;
 }

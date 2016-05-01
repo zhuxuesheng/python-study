@@ -314,8 +314,8 @@ static void
 list_dealloc(PyListObject *op)
 {
     Py_ssize_t i;
-    //PyObject_GC_UnTrack(op);
-    //Py_TRASHCAN_SAFE_BEGIN(op)
+    PyObject_GC_UnTrack(op);
+    Py_TRASHCAN_SAFE_BEGIN(op)
     if (op->ob_item != NULL) {
         /* Do it backwards, for Christian Tismer.
            There's a simple test case where somehow this reduces
@@ -331,12 +331,65 @@ list_dealloc(PyListObject *op)
         free_list[numfree++] = op;
     else
         Py_TYPE(op)->tp_free((PyObject *)op);
-    //Py_TRASHCAN_SAFE_END(op)
+    Py_TRASHCAN_SAFE_END(op)
 }
 
 static PyObject *
 list_repr(PyListObject *v)
 {
+    Py_ssize_t i;
+    PyObject *s;
+    _PyUnicodeWriter writer;
+
+    if (Py_SIZE(v) == 0) {
+        return PyUnicode_FromString("[]");
+    }
+
+    i = Py_ReprEnter((PyObject*)v);
+    if (i != 0) {
+        return i > 0 ? PyUnicode_FromString("[...]") : NULL;
+    }
+
+    _PyUnicodeWriter_Init(&writer);
+    writer.overallocate = 1;
+    /* "[" + "1" + ", 2" * (len - 1) + "]" */
+    writer.min_length = 1 + 1 + (2 + 1) * (Py_SIZE(v) - 1) + 1;
+
+    if (_PyUnicodeWriter_WriteChar(&writer, '[') < 0)
+        goto error;
+
+    /* Do repr() on each element.  Note that this may mutate the list,
+       so must refetch the list size on each iteration. */
+    for (i = 0; i < Py_SIZE(v); ++i) {
+        if (i > 0) {
+            if (_PyUnicodeWriter_WriteASCIIString(&writer, ", ", 2) < 0)
+                goto error;
+        }
+
+        if (Py_EnterRecursiveCall(" while getting the repr of a list"))
+            goto error;
+        s = PyObject_Repr(v->ob_item[i]);
+        Py_LeaveRecursiveCall();
+        if (s == NULL)
+            goto error;
+
+        if (_PyUnicodeWriter_WriteStr(&writer, s) < 0) {
+            Py_DECREF(s);
+            goto error;
+        }
+        Py_DECREF(s);
+    }
+
+    writer.overallocate = 0;
+    if (_PyUnicodeWriter_WriteChar(&writer, ']') < 0)
+        goto error;
+
+    Py_ReprLeave((PyObject *)v);
+    return _PyUnicodeWriter_Finish(&writer);
+
+error:
+    _PyUnicodeWriter_Dealloc(&writer);
+    Py_ReprLeave((PyObject *)v);
     return NULL;
 }
 

@@ -1001,9 +1001,14 @@ PyAPI_FUNC(void) _PyTrash_thread_destroy_chain(void);
 #define PyTrash_UNWIND_LEVEL 50
 
 #define Py_TRASHCAN_SAFE_BEGIN(op) \
-    do {
+    do { \
+        int trash_delete_nesting = 0; \
+        if (0) { \
+            ++trash_delete_nesting;
             /* The body of the deallocator is here. */
 #define Py_TRASHCAN_SAFE_END(op) \
+            --trash_delete_nesting; \
+        } \
     } while (0);
 
 #ifndef Py_LIMITED_API

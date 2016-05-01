@@ -30,6 +30,8 @@ REM ** Object **
 REM ** Python **
 %CC% ..\Python\pyctype.c
 %CC% ..\Python\pyhash.c
+%CC% ..\Python\pystrtod.c
+%CC% ..\Python\dtoa.c
 
 %CC% test.c
 link /out:test.exe /debug *.obj

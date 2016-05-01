@@ -90,11 +90,17 @@
 #include "setobject.h"
 #include "methodobject.h"
 
+#include "structseq.h"
+#include "descrobject.h"
 #include "pyerrors.h"
 #include "abstract.h"
 #include "ceval.h"
 #include "pyfpe.h"
 #include "pyctype.h"
+#include "pystrtod.h"
+#include "codecs.h"
+
+#include "sliceobject.h"
 
 #if 0
 #include "moduleobject.h"
@@ -103,17 +109,16 @@
 #include "fileobject.h"
 #include "pycapsule.h"
 #include "traceback.h"
-#include "sliceobject.h"
+
 #include "cellobject.h"
 #include "iterobject.h"
 #include "genobject.h"
 #include "descrobject.h"
 #include "warnings.h"
 #include "weakrefobject.h"
-#include "structseq.h"
+
 #include "namespaceobject.h"
 
-#include "codecs.h"
 
 #include "pystate.h"
 
@@ -130,7 +135,6 @@
 #include "compile.h"
 #include "eval.h"
 
-#include "pystrtod.h"
 #include "pystrcmp.h"
 #include "dtoa.h"
 #include "fileutils.h"

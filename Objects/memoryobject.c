@@ -2391,7 +2391,7 @@ memory_subscript(PyMemoryViewObject *self, PyObject *key)
                 return NULL;
             return unpack_single(view->buf, fmt);
         }
-        else if (key == NULL) {
+        else if (key == Py_Ellipsis) {
             Py_INCREF(self);
             return (PyObject *)self;
         }
@@ -2461,7 +2461,7 @@ memory_ass_sub(PyMemoryViewObject *self, PyObject *key, PyObject *value)
         return -1;
     }
     if (view->ndim == 0) {
-        if (key == NULL ||
+        if (key == Py_Ellipsis ||
             (PyTuple_Check(key) && PyTuple_GET_SIZE(key)==0)) {
             ptr = (char *)view->buf;
             return pack_single(ptr, value, fmt);
@@ -3055,6 +3055,21 @@ PyDoc_STRVAR(memory_contiguous_doc,
              "A bool indicating whether the memory is contiguous.");
 
 
+static PyGetSetDef memory_getsetlist[] = {
+    {"obj",             (getter)memory_obj_get,        NULL, memory_obj_doc},
+    {"nbytes",          (getter)memory_nbytes_get,     NULL, memory_nbytes_doc},
+    {"readonly",        (getter)memory_readonly_get,   NULL, memory_readonly_doc},
+    {"itemsize",        (getter)memory_itemsize_get,   NULL, memory_itemsize_doc},
+    {"format",          (getter)memory_format_get,     NULL, memory_format_doc},
+    {"ndim",            (getter)memory_ndim_get,       NULL, memory_ndim_doc},
+    {"shape",           (getter)memory_shape_get,      NULL, memory_shape_doc},
+    {"strides",         (getter)memory_strides_get,    NULL, memory_strides_doc},
+    {"suboffsets",      (getter)memory_suboffsets_get, NULL, memory_suboffsets_doc},
+    {"c_contiguous",    (getter)memory_c_contiguous,   NULL, memory_c_contiguous_doc},
+    {"f_contiguous",    (getter)memory_f_contiguous,   NULL, memory_f_contiguous_doc},
+    {"contiguous",      (getter)memory_contiguous,     NULL, memory_contiguous_doc},
+    {NULL, NULL, NULL, NULL},
+};
 
 PyDoc_STRVAR(memory_release_doc,
 "release($self, /)\n--\n\
@@ -3119,7 +3134,7 @@ PyTypeObject PyMemoryView_Type = {
     0,                                        /* tp_iternext */
     memory_methods,                           /* tp_methods */
     0,                                        /* tp_members */
-    0,                        /* tp_getset */
+    memory_getsetlist,                        /* tp_getset */
     0,                                        /* tp_base */
     0,                                        /* tp_dict */
     0,                                        /* tp_descr_get */
