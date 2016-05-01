@@ -296,21 +296,6 @@ _PyArg_NoKeywords(const char *funcname, PyObject *kw)
 {
 }
 
-PyTypeObject PySlice_Type;
-PyObject _Py_EllipsisObject;
-
-PyObject *
-_PySlice_FromIndices(Py_ssize_t istart, Py_ssize_t istop)
-{
-}
-
-int
-PySlice_GetIndicesEx(PyObject *_r, Py_ssize_t length,
-                     Py_ssize_t *start, Py_ssize_t *stop, Py_ssize_t *step,
-                     Py_ssize_t *slicelength)
-{
-}
-
 int
 _PyEval_SliceIndex(PyObject *v, Py_ssize_t *pi)
 {

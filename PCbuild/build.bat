@@ -26,6 +26,7 @@ REM ** Object **
 %CC% ..\Objects\memoryobject.c
 %CC% ..\Objects\odictobject.c
 %CC% ..\Objects\enumobject.c
+%CC% ..\Objects\sliceobject.c
 
 REM ** Python **
 %CC% ..\Python\pyctype.c
