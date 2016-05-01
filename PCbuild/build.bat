@@ -24,6 +24,8 @@ REM ** Object **
 %CC% ..\Objects\setobject.c
 %CC% ..\Objects\rangeobject.c
 %CC% ..\Objects\memoryobject.c
+%CC% ..\Objects\odictobject.c
+%CC% ..\Objects\enumobject.c
 
 REM ** Python **
 %CC% ..\Python\pyctype.c
