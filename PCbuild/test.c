@@ -179,7 +179,7 @@ PyUnicode_FromStringAndSize(const char *u, Py_ssize_t size)
 
 PyObject *PyExc_OverflowError, *PyExc_TypeError, *PyExc_ValueError, *PyExc_ZeroDivisionError, *PyExc_DeprecationWarning;
 PyObject *PyExc_IndexError, *PyExc_SystemError, *PyExc_BufferError, *PyExc_StopIteration, *PyExc_AttributeError;
-PyObject *PyExc_KeyError, *PyExc_MemoryError, *PyExc_RuntimeError;
+PyObject *PyExc_KeyError, *PyExc_MemoryError, *PyExc_RuntimeError, *PyExc_ImportError, *PyExc_NotImplementedError;
 
 PyTypeObject PyType_Type; // wait type module
 PyGC_Head *_PyGC_generation0;
@@ -365,7 +365,22 @@ PyUnicode_Substring(PyObject *self, Py_ssize_t start, Py_ssize_t end)
 {
 }
 
+PyObject *
+PyUnicode_AsASCIIString(PyObject *unicode)
+{
+}
+
 void
 PyObject_ClearWeakRefs(PyObject *object)
+{
+}
+
+PyObject *
+_Py_strhex(const char* argbuf, const Py_ssize_t arglen)
+{
+}
+
+PyObject *
+PyImport_ImportModule(const char *name)
 {
 }

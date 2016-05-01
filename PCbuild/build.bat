@@ -23,6 +23,7 @@ REM ** Object **
 %CC% ..\Objects\abstract.c
 %CC% ..\Objects\setobject.c
 %CC% ..\Objects\rangeobject.c
+%CC% ..\Objects\memoryobject.c
 
 REM ** Python **
 %CC% ..\Python\pyctype.c
