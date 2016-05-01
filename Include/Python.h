@@ -80,12 +80,16 @@
 #include "boolobject.h"
 #include "floatobject.h"
 #include "complexobject.h"
+#include "rangeobject.h"
+#include "memoryobject.h"
 #include "tupleobject.h"
 #include "listobject.h"
 #include "dictobject.h"
+#include "odictobject.h"
+#include "enumobject.h"
 #include "setobject.h"
-
 #include "methodobject.h"
+
 #include "pyerrors.h"
 #include "abstract.h"
 #include "ceval.h"
@@ -93,12 +97,6 @@
 #include "pyctype.h"
 
 #if 0
-
-#include "rangeobject.h"
-#include "memoryobject.h"
-
-#include "odictobject.h"
-#include "enumobject.h"
 #include "moduleobject.h"
 #include "funcobject.h"
 #include "classobject.h"
@@ -115,6 +113,7 @@
 #include "structseq.h"
 #include "namespaceobject.h"
 
+#include "codecs.h"
 
 #include "pystate.h"
 
@@ -131,6 +130,7 @@
 #include "compile.h"
 #include "eval.h"
 
+#include "pystrtod.h"
 #include "pystrcmp.h"
 #include "dtoa.h"
 #include "fileutils.h"
