@@ -291,6 +291,11 @@ PyArg_ValidateKeywordArguments(PyObject *kwargs)
 {
 }
 
+int
+_PyArg_NoKeywords(const char *funcname, PyObject *kw)
+{
+}
+
 PyObject *
 _PySlice_FromIndices(Py_ssize_t istart, Py_ssize_t istop)
 {
@@ -355,15 +360,12 @@ _PyUnicode_FromId(_Py_Identifier *id)
 {
 }
 
-PyTypeObject PySet_Type, PyFrozenSet_Type;
-
-int
-_PySet_NextEntry(PyObject *set, Py_ssize_t *pos, PyObject **key, Py_hash_t *hash)
+PyObject*
+PyUnicode_Substring(PyObject *self, Py_ssize_t start, Py_ssize_t end)
 {
-    return -1;
 }
 
-PyObject *
-PySet_New(PyObject *iterable)
+void
+PyObject_ClearWeakRefs(PyObject *object)
 {
 }

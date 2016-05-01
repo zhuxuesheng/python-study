@@ -21,6 +21,7 @@ REM ** Object **
 %CC% ..\Objects\listobject.c
 %CC% ..\Objects\dictobject.c
 %CC% ..\Objects\abstract.c
+%CC% ..\Objects\setobject.c
 
 REM ** Python **
 %CC% ..\Python\pyctype.c

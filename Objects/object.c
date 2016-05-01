@@ -277,6 +277,12 @@ _PyObject_NewVar(PyTypeObject *tp, Py_ssize_t nitems)
     return PyObject_INIT_VAR(op, tp, nitems);
 }
 
+
+PyObject *
+PyObject_Repr(PyObject *v)
+{
+    return NULL;
+}
 /* Perform a rich comparison with object result.  This wraps do_richcompare()
    with a check for NULL arguments and a recursion check. */
 
@@ -732,6 +738,29 @@ PyObject _Py_NotImplementedStruct = {
     _PyObject_EXTRA_INIT
     1, &_PyNotImplemented_Type
 };
+
+/* These methods are used to control infinite recursion in repr, str, print,
+   etc.  Container objects that may recursively contain themselves,
+   e.g. builtin dictionaries and lists, should used Py_ReprEnter() and
+   Py_ReprLeave() to avoid infinite recursion.
+
+   Py_ReprEnter() returns 0 the first time it is called for a particular
+   object and 1 every time thereafter.  It returns -1 if an exception
+   occurred.  Py_ReprLeave() has no return value.
+
+   See dictobject.c and listobject.c for examples of use.
+*/
+
+int
+Py_ReprEnter(PyObject *obj)
+{
+    return 0;
+}
+
+void
+Py_ReprLeave(PyObject *obj)
+{
+}
 #ifdef __cplusplus
 }
 #endif
