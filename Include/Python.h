@@ -81,8 +81,9 @@
 #include "floatobject.h"
 #include "complexobject.h"
 #include "tupleobject.h"
-#include "methodobject.h"
 #include "listobject.h"
+
+#include "methodobject.h"
 #include "pyerrors.h"
 #include "abstract.h"
 #include "ceval.h"
@@ -98,7 +99,6 @@
 #include "odictobject.h"
 #include "enumobject.h"
 #include "setobject.h"
-
 #include "moduleobject.h"
 #include "funcobject.h"
 #include "classobject.h"
@@ -116,14 +116,12 @@
 #include "namespaceobject.h"
 
 
-
 #include "pystate.h"
 
 #include "pyarena.h"
 #include "modsupport.h"
 #include "pythonrun.h"
 #include "pylifecycle.h"
-
 #include "sysmodule.h"
 #include "intrcheck.h"
 #include "import.h"
@@ -132,8 +130,6 @@
 
 #include "compile.h"
 #include "eval.h"
-
-
 
 #include "pystrcmp.h"
 #include "dtoa.h"
