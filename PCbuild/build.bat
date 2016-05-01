@@ -27,6 +27,7 @@ REM ** Object **
 %CC% ..\Objects\odictobject.c
 %CC% ..\Objects\enumobject.c
 %CC% ..\Objects\sliceobject.c
+%CC% ..\Objects\structseq.c
 
 REM ** Python **
 %CC% ..\Python\pyctype.c

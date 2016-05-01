@@ -459,16 +459,6 @@ _PyFloat_FormatAdvancedWriter(_PyUnicodeWriter *writer,
 {
 }
 
-PyObject *
-PyStructSequence_New(PyTypeObject *type)
-{
-}
-
-int
-PyStructSequence_InitType2(PyTypeObject *type, PyStructSequence_Desc *desc)
-{
-}
-
 int
 PyType_Ready(PyTypeObject *type)
 {
