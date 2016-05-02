@@ -3654,7 +3654,7 @@ PyUnicode_FSConverter(PyObject* arg, void* addr)
         return 0;
     }
     *(PyObject**)addr = output;
-    return 0x20000;
+    return Py_CLEANUP_SUPPORTED;
 }
 
 
@@ -3698,7 +3698,7 @@ PyUnicode_FSDecoder(PyObject* arg, void* addr)
         return 0;
     }
     *(PyObject**)addr = output;
-    return 0x20000;
+    return Py_CLEANUP_SUPPORTED;
 }
 
 
@@ -14907,7 +14907,7 @@ PyTypeObject PyUnicode_Type = {
     unicode_methods,            /* tp_methods */
     0,                  /* tp_members */
     0,                  /* tp_getset */
-    0,         /* tp_base */
+    &PyBaseObject_Type,         /* tp_base */
     0,                  /* tp_dict */
     0,                  /* tp_descr_get */
     0,                  /* tp_descr_set */
@@ -14984,6 +14984,53 @@ _PyUnicode_Fini(void)
 void
 PyUnicode_InternInPlace(PyObject **p)
 {
+    PyObject *s = *p;
+    PyObject *t;
+#ifdef Py_DEBUG
+    assert(s != NULL);
+    assert(_PyUnicode_CHECK(s));
+#else
+    if (s == NULL || !PyUnicode_Check(s))
+        return;
+#endif
+    /* If it's a subclass, we don't really know what putting
+       it in the interned dict might do. */
+    if (!PyUnicode_CheckExact(s))
+        return;
+    if (PyUnicode_CHECK_INTERNED(s))
+        return;
+    if (interned == NULL) {
+        interned = PyDict_New();
+        if (interned == NULL) {
+            PyErr_Clear(); /* Don't leave an exception */
+            return;
+        }
+    }
+    /* It might be that the GetItem call fails even
+       though the key is present in the dictionary,
+       namely when this happens during a stack overflow. */
+    Py_ALLOW_RECURSION
+    t = PyDict_GetItem(interned, s);
+    Py_END_ALLOW_RECURSION
+
+    if (t) {
+        Py_INCREF(t);
+        Py_DECREF(*p);
+        *p = t;
+        return;
+    }
+
+    //PyThreadState_GET()->recursion_critical = 1;
+    if (PyDict_SetItem(interned, s, s) < 0) {
+        PyErr_Clear();
+        //PyThreadState_GET()->recursion_critical = 0;
+        return;
+    }
+    //PyThreadState_GET()->recursion_critical = 0;
+    /* The two references in interned are not counted by refcnt.
+       The deallocator will take care of this */
+    Py_REFCNT(s) -= 2;
+    _PyUnicode_STATE(s).interned = SSTATE_INTERNED_MORTAL;
 }
 
 void
@@ -15172,7 +15219,7 @@ PyTypeObject PyUnicodeIter_Type = {
     sizeof(unicodeiterobject),      /* tp_basicsize */
     0,                  /* tp_itemsize */
     /* methods */
-    0,    /* tp_dealloc */
+    (destructor)unicodeiter_dealloc,    /* tp_dealloc */
     0,                  /* tp_print */
     0,                  /* tp_getattr */
     0,                  /* tp_setattr */
@@ -15184,18 +15231,18 @@ PyTypeObject PyUnicodeIter_Type = {
     0,                  /* tp_hash */
     0,                  /* tp_call */
     0,                  /* tp_str */
-    0,        /* tp_getattro */
+    PyObject_GenericGetAttr,        /* tp_getattro */
     0,                  /* tp_setattro */
     0,                  /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GC,/* tp_flags */
     0,                  /* tp_doc */
-    0, /* tp_traverse */
+    (traverseproc)unicodeiter_traverse, /* tp_traverse */
     0,                  /* tp_clear */
     0,                  /* tp_richcompare */
     0,                  /* tp_weaklistoffset */
-    0,          /* tp_iter */
-    0,     /* tp_iternext */
-    0,            /* tp_methods */
+    PyObject_SelfIter,          /* tp_iter */
+    (iternextfunc)unicodeiter_next,     /* tp_iternext */
+    unicodeiter_methods,            /* tp_methods */
     0,
 };
 
@@ -15351,7 +15398,23 @@ static PyMethodDef _string_methods[] = {
     {NULL, NULL}
 };
 
+static struct PyModuleDef _string_module = {
+    PyModuleDef_HEAD_INIT,
+    "_string",
+    PyDoc_STR("string helper module"),
+    0,
+    _string_methods,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+};
 
+PyMODINIT_FUNC
+PyInit__string(void)
+{
+    return PyModule_Create(&_string_module);
+}
 
 
 #ifdef __cplusplus
