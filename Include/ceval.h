@@ -21,6 +21,8 @@ PyAPI_FUNC(PyObject *) PyEval_CallMethod(PyObject *obj,
                                          const char *format, ...);
 
 #ifndef Py_LIMITED_API
+PyAPI_FUNC(void) PyEval_SetProfile(Py_tracefunc, PyObject *);
+PyAPI_FUNC(void) PyEval_SetTrace(Py_tracefunc, PyObject *);
 PyAPI_FUNC(void) _PyEval_SetCoroutineWrapper(PyObject *);
 PyAPI_FUNC(PyObject *) _PyEval_GetCoroutineWrapper(void);
 #endif
@@ -64,8 +66,13 @@ PyAPI_FUNC(int) Py_MakePendingCalls(void);
 PyAPI_FUNC(void) Py_SetRecursionLimit(int);
 PyAPI_FUNC(int) Py_GetRecursionLimit(void);
 
-#define Py_EnterRecursiveCall(where) (0)
-#define Py_LeaveRecursiveCall() (0)
+#define Py_EnterRecursiveCall(where)  \
+            (_Py_MakeRecCheck(PyThreadState_GET()->recursion_depth) &&  \
+             _Py_CheckRecursiveCall(where))
+#define Py_LeaveRecursiveCall()                         \
+    do{ if(_Py_MakeEndRecCheck(PyThreadState_GET()->recursion_depth))  \
+      PyThreadState_GET()->overflowed = 0;  \
+    } while(0)
 PyAPI_FUNC(int) _Py_CheckRecursiveCall(const char *where);
 PyAPI_DATA(int) _Py_CheckRecursionLimit;
 
@@ -75,7 +82,8 @@ PyAPI_DATA(int) _Py_CheckRecursionLimit;
    the "overflowed" flag is set, in which case we need the true value
    of _Py_CheckRecursionLimit for _Py_MakeEndRecCheck() to function properly.
 */
-#  define _Py_MakeRecCheck(x)
+#  define _Py_MakeRecCheck(x)  \
+    (++(x) > (_Py_CheckRecursionLimit += PyThreadState_GET()->overflowed - 1))
 #else
 #  define _Py_MakeRecCheck(x)  (++(x) > _Py_CheckRecursionLimit)
 #endif
@@ -91,9 +99,13 @@ PyAPI_DATA(int) _Py_CheckRecursionLimit;
 #define _Py_MakeEndRecCheck(x) \
     (--(x) < _Py_RecursionLimitLowerWaterMark(_Py_CheckRecursionLimit))
 
-#define Py_ALLOW_RECURSION
+#define Py_ALLOW_RECURSION \
+  do { unsigned char _old = PyThreadState_GET()->recursion_critical;\
+    PyThreadState_GET()->recursion_critical = 1;
 
-#define Py_END_ALLOW_RECURSION
+#define Py_END_ALLOW_RECURSION \
+    PyThreadState_GET()->recursion_critical = _old; \
+  } while(0);
 
 PyAPI_FUNC(const char *) PyEval_GetFuncName(PyObject *);
 PyAPI_FUNC(const char *) PyEval_GetFuncDesc(PyObject *);
@@ -147,6 +159,8 @@ PyAPI_FUNC(PyObject *) PyEval_EvalFrameEx(struct _frame *f, int exc);
    mechanism!
 */
 
+PyAPI_FUNC(PyThreadState *) PyEval_SaveThread(void);
+PyAPI_FUNC(void) PyEval_RestoreThread(PyThreadState *);
 
 #ifdef WITH_THREAD
 

@@ -274,6 +274,9 @@ _Py_DisplaySourceLine(PyObject *f, PyObject *filename, int lineno, int indent)
     if (filename == NULL)
         return 0;
 
+    io = PyImport_ImportModuleNoBlock("io");
+    if (io == NULL)
+        return -1;
     binary = _PyObject_CallMethodId(io, &PyId_open, "Os", filename, "rb");
 
     if (binary == NULL) {

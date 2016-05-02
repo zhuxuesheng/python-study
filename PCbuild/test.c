@@ -211,11 +211,6 @@ _PyObject_LookupSpecial(PyObject *self, _Py_Identifier *attrid)
     return NULL;
 }
 
-PyObject *
-PySeqIter_New(PyObject *seq)
-{
-}
-
 void
 PyObject_ClearWeakRefs(PyObject *object)
 {
@@ -323,4 +318,10 @@ PyTokenizer_FindEncodingFilename(int fd, PyObject *filename)
 PyObject *
 PySys_GetObject(const char *name)
 {
+}
+
+PyObject *
+PyImport_ImportModuleNoBlock(const char *name)
+{
+    return NULL;
 }

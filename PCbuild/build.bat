@@ -41,6 +41,7 @@ REM ** Object **
 %CC% ..\Objects\methodobject.c
 %CC% ..\Objects\classobject.c
 %CC% ..\Objects\fileobject.c
+%CC% ..\Objects\iterobject.c
 
 REM ** Python **
 %CC% ..\Python\pyctype.c
