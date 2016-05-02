@@ -103,40 +103,33 @@
 #include "warnings.h"
 #include "weakrefobject.h"
 #include "structseq.h"
-//#include "namespaceobject.h"
+#include "namespaceobject.h"
 
 #include "codecs.h"
 #include "pyerrors.h"
 
 #include "pystate.h"
 
-#include "abstract.h"
-#include "ceval.h"
-
-
-
+#include "pyarena.h"
 #include "modsupport.h"
+//#include "pythonrun.h"
+//#include "pylifecycle.h"
+#include "ceval.h"
+//#include "sysmodule.h"
+//#include "intrcheck.h"
+//#include "import.h"
+
+#include "abstract.h"
+//#include "bltinmodule.h"
+
+//#include "compile.h"
 #include "eval.h"
 
 #include "pyctype.h"
 #include "pystrtod.h"
+//#include "pystrcmp.h"
+//#include "dtoa.h"
 #include "fileutils.h"
 #include "pyfpe.h"
 
-#if 0
-#include "pyarena.h"
-#include "pythonrun.h"
-#include "pylifecycle.h"
-#include "sysmodule.h"
-#include "intrcheck.h"
-#include "import.h"
-
-#include "bltinmodule.h"
-
-#include "compile.h"
-
-#include "pystrcmp.h"
-#include "dtoa.h"
-
-#endif
 #endif /* !Py_PYTHON_H */

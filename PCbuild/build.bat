@@ -43,6 +43,7 @@ REM ** Object **
 %CC% ..\Objects\fileobject.c
 %CC% ..\Objects\iterobject.c
 %CC% ..\Objects\weakrefobject.c
+%CC% ..\Objects\namespaceobject.c
 
 REM ** Python **
 %CC% ..\Python\pyctype.c
