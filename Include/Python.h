@@ -110,7 +110,7 @@
 
 #include "pystate.h"
 
-#include "pyarena.h"
+//#include "pyarena.h"
 #include "modsupport.h"
 //#include "pythonrun.h"
 //#include "pylifecycle.h"

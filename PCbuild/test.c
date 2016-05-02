@@ -103,37 +103,7 @@ PyObject *PyExc_IndexError, *PyExc_SystemError, *PyExc_BufferError, *PyExc_StopI
 PyObject *PyExc_KeyError, *PyExc_MemoryError, *PyExc_RuntimeError, *PyExc_ImportError, *PyExc_NotImplementedError;
 PyObject *PyExc_RuntimeWarning;
 
-PyTypeObject PyType_Type; // wait type module
-PyTypeObject PyBaseObject_Type;
 PyGC_Head *_PyGC_generation0;
-
-int
-PyType_IsSubtype(PyTypeObject *a, PyTypeObject *b)
-{
-    printf("PyType_IsSubtype is not implemented yet, always return 1 ...\n");
-    return 1;
-}
-
-PyObject *
-PyType_GenericAlloc(PyTypeObject *type, Py_ssize_t nitems)
-{
-}
-
-PyObject *
-PyType_GenericNew(PyTypeObject *type, PyObject *args, PyObject *kwds)
-{
-    return type->tp_alloc(type, 0);
-}
-
-PyObject *
-_PyType_GetDocFromInternalDoc(const char *name, const char *internal_doc)
-{
-}
-
-PyObject *
-_PyType_GetTextSignatureFromInternalDoc(const char *name, const char *internal_doc)
-{
-}
 
 void
 PyObject_GC_Track(void *op)
@@ -177,6 +147,12 @@ _PyObject_GC_NewVar(PyTypeObject *tp, Py_ssize_t nitems)
     return op;
 }
 
+PyObject *
+_PyObject_GC_Malloc(size_t basicsize)
+{
+    PyObject_Malloc(basicsize);
+}
+
 void
 PyObject_GC_Del(void *op)
 {
@@ -186,12 +162,6 @@ PyObject_GC_Del(void *op)
 PyVarObject *
 _PyObject_GC_Resize(PyVarObject *op, Py_ssize_t nitems)
 {
-}
-
-PyObject *
-_PyObject_LookupSpecial(PyObject *self, _Py_Identifier *attrid)
-{
-    return NULL;
 }
 
 PyObject *
@@ -241,16 +211,6 @@ _PyUnicode_FormatAdvancedWriter(_PyUnicodeWriter *writer,
 {
 }
 
-int
-PyType_Ready(PyTypeObject *type)
-{
-}
-
-PyObject *
-_PyType_Lookup(PyTypeObject *type, PyObject *name)
-{
-}
-
 PyObject *PyCodec_Encode(PyObject *object,
                          const char *encoding,
                          const char *errors)
@@ -283,11 +243,6 @@ PyObject *PyCodec_StrictErrors(PyObject *exc)
 {
 }
 
-void *
-PyCapsule_Import(const char *name, int no_block)
-{
-}
-
 char *
 PyTokenizer_FindEncodingFilename(int fd, PyObject *filename)
 {
@@ -306,5 +261,10 @@ PyImport_ImportModuleNoBlock(const char *name)
 
 PyObject *
 PyImport_GetModuleDict(void)
+{
+}
+
+PyObject *
+_Py_Mangle(PyObject *privateobj, PyObject *ident)
 {
 }

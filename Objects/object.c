@@ -1559,6 +1559,179 @@ PyObject _Py_NotImplementedStruct = {
 void
 _Py_ReadyTypes(void)
 {
+    if (PyType_Ready(&PyBaseObject_Type) < 0)
+        Py_FatalError("Can't initialize object type");
+
+    if (PyType_Ready(&PyType_Type) < 0)
+        Py_FatalError("Can't initialize type type");
+
+    if (PyType_Ready(&_PyWeakref_RefType) < 0)
+        Py_FatalError("Can't initialize weakref type");
+
+    if (PyType_Ready(&_PyWeakref_CallableProxyType) < 0)
+        Py_FatalError("Can't initialize callable weakref proxy type");
+
+    if (PyType_Ready(&_PyWeakref_ProxyType) < 0)
+        Py_FatalError("Can't initialize weakref proxy type");
+
+    if (PyType_Ready(&PyLong_Type) < 0)
+        Py_FatalError("Can't initialize int type");
+
+    if (PyType_Ready(&PyBool_Type) < 0)
+        Py_FatalError("Can't initialize bool type");
+
+    if (PyType_Ready(&PyByteArray_Type) < 0)
+        Py_FatalError("Can't initialize bytearray type");
+
+    if (PyType_Ready(&PyBytes_Type) < 0)
+        Py_FatalError("Can't initialize 'str'");
+
+    if (PyType_Ready(&PyList_Type) < 0)
+        Py_FatalError("Can't initialize list type");
+
+    if (PyType_Ready(&_PyNone_Type) < 0)
+        Py_FatalError("Can't initialize None type");
+
+    if (PyType_Ready(&_PyNotImplemented_Type) < 0)
+        Py_FatalError("Can't initialize NotImplemented type");
+
+    if (PyType_Ready(&PyTraceBack_Type) < 0)
+        Py_FatalError("Can't initialize traceback type");
+
+    if (PyType_Ready(&PySuper_Type) < 0)
+        Py_FatalError("Can't initialize super type");
+
+    if (PyType_Ready(&PyRange_Type) < 0)
+        Py_FatalError("Can't initialize range type");
+
+    if (PyType_Ready(&PyDict_Type) < 0)
+        Py_FatalError("Can't initialize dict type");
+
+    if (PyType_Ready(&PyODict_Type) < 0)
+        Py_FatalError("Can't initialize OrderedDict type");
+
+    if (PyType_Ready(&PyODictKeys_Type) < 0)
+        Py_FatalError("Can't initialize odict_keys type");
+
+    if (PyType_Ready(&PyODictItems_Type) < 0)
+        Py_FatalError("Can't initialize odict_items type");
+
+    if (PyType_Ready(&PyODictValues_Type) < 0)
+        Py_FatalError("Can't initialize odict_values type");
+
+    if (PyType_Ready(&PyODictIter_Type) < 0)
+        Py_FatalError("Can't initialize odict_keyiterator type");
+
+    if (PyType_Ready(&PySet_Type) < 0)
+        Py_FatalError("Can't initialize set type");
+
+    if (PyType_Ready(&PyUnicode_Type) < 0)
+        Py_FatalError("Can't initialize str type");
+
+    if (PyType_Ready(&PySlice_Type) < 0)
+        Py_FatalError("Can't initialize slice type");
+
+    if (PyType_Ready(&PyStaticMethod_Type) < 0)
+        Py_FatalError("Can't initialize static method type");
+
+    if (PyType_Ready(&PyComplex_Type) < 0)
+        Py_FatalError("Can't initialize complex type");
+
+    if (PyType_Ready(&PyFloat_Type) < 0)
+        Py_FatalError("Can't initialize float type");
+
+    if (PyType_Ready(&PyFrozenSet_Type) < 0)
+        Py_FatalError("Can't initialize frozenset type");
+
+    if (PyType_Ready(&PyProperty_Type) < 0)
+        Py_FatalError("Can't initialize property type");
+
+    if (PyType_Ready(&_PyManagedBuffer_Type) < 0)
+        Py_FatalError("Can't initialize managed buffer type");
+
+    if (PyType_Ready(&PyMemoryView_Type) < 0)
+        Py_FatalError("Can't initialize memoryview type");
+
+    if (PyType_Ready(&PyTuple_Type) < 0)
+        Py_FatalError("Can't initialize tuple type");
+
+    if (PyType_Ready(&PyEnum_Type) < 0)
+        Py_FatalError("Can't initialize enumerate type");
+
+    if (PyType_Ready(&PyReversed_Type) < 0)
+        Py_FatalError("Can't initialize reversed type");
+
+    if (PyType_Ready(&PyStdPrinter_Type) < 0)
+        Py_FatalError("Can't initialize StdPrinter");
+
+    if (PyType_Ready(&PyCode_Type) < 0)
+        Py_FatalError("Can't initialize code type");
+
+    if (PyType_Ready(&PyFrame_Type) < 0)
+        Py_FatalError("Can't initialize frame type");
+
+    if (PyType_Ready(&PyCFunction_Type) < 0)
+        Py_FatalError("Can't initialize builtin function type");
+
+    if (PyType_Ready(&PyMethod_Type) < 0)
+        Py_FatalError("Can't initialize method type");
+
+    if (PyType_Ready(&PyFunction_Type) < 0)
+        Py_FatalError("Can't initialize function type");
+
+    if (PyType_Ready(&PyDictProxy_Type) < 0)
+        Py_FatalError("Can't initialize dict proxy type");
+
+    if (PyType_Ready(&PyGen_Type) < 0)
+        Py_FatalError("Can't initialize generator type");
+
+    if (PyType_Ready(&PyGetSetDescr_Type) < 0)
+        Py_FatalError("Can't initialize get-set descriptor type");
+
+    if (PyType_Ready(&PyWrapperDescr_Type) < 0)
+        Py_FatalError("Can't initialize wrapper type");
+
+    if (PyType_Ready(&_PyMethodWrapper_Type) < 0)
+        Py_FatalError("Can't initialize method wrapper type");
+
+    if (PyType_Ready(&PyEllipsis_Type) < 0)
+        Py_FatalError("Can't initialize ellipsis type");
+
+    if (PyType_Ready(&PyMemberDescr_Type) < 0)
+        Py_FatalError("Can't initialize member descriptor type");
+
+    if (PyType_Ready(&_PyNamespace_Type) < 0)
+        Py_FatalError("Can't initialize namespace type");
+
+    if (PyType_Ready(&PyCapsule_Type) < 0)
+        Py_FatalError("Can't initialize capsule type");
+
+    if (PyType_Ready(&PyLongRangeIter_Type) < 0)
+        Py_FatalError("Can't initialize long range iterator type");
+
+    if (PyType_Ready(&PyCell_Type) < 0)
+        Py_FatalError("Can't initialize cell type");
+
+    if (PyType_Ready(&PyInstanceMethod_Type) < 0)
+        Py_FatalError("Can't initialize instance method type");
+
+    if (PyType_Ready(&PyClassMethodDescr_Type) < 0)
+        Py_FatalError("Can't initialize class method descr type");
+
+    if (PyType_Ready(&PyMethodDescr_Type) < 0)
+        Py_FatalError("Can't initialize method descr type");
+
+    if (PyType_Ready(&PyCallIter_Type) < 0)
+        Py_FatalError("Can't initialize call iter type");
+
+    if (PyType_Ready(&PySeqIter_Type) < 0)
+        Py_FatalError("Can't initialize sequence iterator type");
+
+    if (PyType_Ready(&PyCoro_Type) < 0)
+        Py_FatalError("Can't initialize coroutine type");
+
+    if (PyType_Ready(&_PyCoroWrapper_Type) < 0)
+        Py_FatalError("Can't initialize coroutine wrapper type");
 }
 
 
