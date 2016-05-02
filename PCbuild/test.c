@@ -11,6 +11,7 @@ Py_FatalError(const char *msg)
 
 const char *Py_hexdigits = "0123456789abcdef";
 int Py_VerboseFlag;
+int Py_BytesWarningFlag;
 
 int main()
 {
@@ -115,6 +116,7 @@ PyObject *PyExc_KeyError, *PyExc_MemoryError, *PyExc_RuntimeError, *PyExc_Import
 PyObject *PyExc_RuntimeWarning;
 
 PyTypeObject PyType_Type; // wait type module
+PyTypeObject PyBaseObject_Type;
 PyGC_Head *_PyGC_generation0;
 
 int
@@ -192,47 +194,6 @@ PyObject *
 _PyObject_LookupSpecial(PyObject *self, _Py_Identifier *attrid)
 {
     return NULL;
-}
-
-int
-PyArg_ParseTuple(PyObject *args, const char *format, ...)
-{
-}
-
-int
-PyArg_ParseTupleAndKeywords(PyObject *args,
-                            PyObject *keywords,
-                            const char *format,
-                            char **kwlist, ...)
-{
-}
-
-int
-_PyArg_ParseTuple_SizeT(PyObject *args, char *format, ...)
-{
-}
-
-int
-_PyArg_ParseTupleAndKeywords_SizeT(PyObject *args,
-                                  PyObject *keywords,
-                                  const char *format,
-                                  char **kwlist, ...)
-{
-}
-
-int
-PyArg_UnpackTuple(PyObject *args, const char *name, Py_ssize_t min, Py_ssize_t max, ...)
-{
-}
-
-int
-PyArg_ValidateKeywordArguments(PyObject *kwargs)
-{
-}
-
-int
-_PyArg_NoKeywords(const char *funcname, PyObject *kw)
-{
 }
 
 int

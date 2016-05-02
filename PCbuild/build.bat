@@ -41,6 +41,7 @@ REM ** Python **
 %CC% ..\Python\dtoa.c
 %CC% ..\Python\modsupport.c
 %CC% ..\Python\errors.c
+%CC% ..\Python\getargs.c
 
 %CC% test.c
 link /out:test.exe /debug *.obj
