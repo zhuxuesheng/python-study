@@ -61,6 +61,11 @@ PyOS_snprintf(char *str, size_t size, const  char  *format, ...)
     return rc;
 }
 
+PyObject *
+_PySys_GetObjectId(_Py_Identifier *key)
+{
+}
+
 void
 PySys_WriteStderr(const char *format, ...)
 {
@@ -81,23 +86,6 @@ PySys_FormatStderr(const char *format, ...)
     va_end(va);
 }
 
-PyObject *
-PyErr_NoMemory(void)
-{
-    return NULL;
-}
-
-PyObject *
-PyErr_Format(PyObject *exception, const char *format, ...)
-{
-    va_list va;
-    
-    va_start(va, format);
-    printf(format, va);
-    va_end(va);
-    return NULL;
-}
-
 int
 PyErr_WarnFormat(PyObject *category, Py_ssize_t stack_level,
                  const char *format, ...)
@@ -110,80 +98,10 @@ PyErr_WarnFormat(PyObject *category, Py_ssize_t stack_level,
     return 0;
 }
 
-void
-PyErr_SetString(PyObject *exception, const char *string)
-{
-    printf("Error: %s\n", string);
-}
-
-void
-PyErr_BadInternalCall(void)
-{
-}
-
-PyObject*
-PyErr_Occurred()
-{
-    return 0;
-}
-
 int
 PyErr_CheckSignals(void)
 {
     return 0;
-}
-
-void
-_PyErr_SetKeyError(PyObject *arg)
-{
-}
-
-void
-_PyErr_ChainExceptions(PyObject *exc, PyObject *val, PyObject *tb)
-{
-}
-
-int
-PyErr_BadArgument(void)
-{
-    return 0;
-}
-
-PyObject *
-PyErr_SetFromErrno(PyObject *exc)
-{
-    return 0;
-}
-
-void
-PyErr_SetObject(PyObject *exception, PyObject *value)
-{
-}
-
-int
-PyErr_ExceptionMatches(PyObject *exc)
-{
-}
-
-int
-PyErr_GivenExceptionMatches(PyObject *err, PyObject *exc)
-{
-    return err == exc;
-}
-
-void
-PyErr_Fetch(PyObject **p_type, PyObject **p_value, PyObject **p_traceback)
-{
-}
-
-void
-PyErr_Clear(void)
-{
-}
-
-void
-PyErr_Restore(PyObject *type, PyObject *value, PyObject *traceback)
-{
 }
 
 PyObject *
@@ -302,6 +220,19 @@ PyArg_ParseTupleAndKeywords(PyObject *args,
 }
 
 int
+_PyArg_ParseTuple_SizeT(PyObject *args, char *format, ...)
+{
+}
+
+int
+_PyArg_ParseTupleAndKeywords_SizeT(PyObject *args,
+                                  PyObject *keywords,
+                                  const char *format,
+                                  char **kwlist, ...)
+{
+}
+
+int
 PyArg_UnpackTuple(PyObject *args, const char *name, Py_ssize_t min, Py_ssize_t max, ...)
 {
 }
@@ -348,6 +279,20 @@ PyUnicode_FromFormat(const char *format, ...)
 {
 }
 
+PyObject *
+PyUnicode_FromFormatV(const char *format, va_list vargs)
+{
+}
+
+PyObject *
+PyUnicode_FromWideChar(const wchar_t *w, Py_ssize_t size)
+{
+}
+
+PyObject*
+PyUnicode_DecodeFSDefault(const char *s) {
+}
+
 void
 PyUnicode_InternInPlace(PyObject **p)
 {
@@ -355,6 +300,11 @@ PyUnicode_InternInPlace(PyObject **p)
 
 PyObject *
 _PyUnicode_FromId(_Py_Identifier *id)
+{
+}
+
+int
+_PyUnicode_CompareWithId(PyObject *left, _Py_Identifier *right)
 {
 }
 
@@ -449,6 +399,33 @@ Py_UNICODE_strlen(const Py_UNICODE *u)
     return res;
 }
 
+Py_UCS4
+PyUnicode_ReadChar(PyObject *unicode, Py_ssize_t index)
+{
+}
+
+Py_ssize_t
+PyUnicode_Tailmatch(PyObject *str,
+                    PyObject *substr,
+                    Py_ssize_t start,
+                    Py_ssize_t end,
+                    int direction)
+{
+}
+
+Py_ssize_t
+PyUnicode_FindChar(PyObject *str, Py_UCS4 ch,
+                   Py_ssize_t start, Py_ssize_t end,
+                   int direction)
+{
+}
+
+int _PyUnicode_IsWhitespace(const Py_UCS4 ch)
+{
+}
+
+const unsigned char _Py_ascii_whitespace[10];
+
 void
 PyObject_ClearWeakRefs(PyObject *object)
 {
@@ -506,4 +483,23 @@ _PyType_Lookup(PyTypeObject *type, PyObject *name)
 PyObject *
 PyCFunction_NewEx(PyMethodDef *ml, PyObject *self, PyObject *module)
 {
+}
+
+int
+PyFile_WriteString(const char *s, PyObject *f)
+{
+}
+
+int
+PyFile_WriteObject(PyObject *v, PyObject *f, int flags)
+{
+}
+
+int
+PyTraceBack_Print(PyObject *v, PyObject *f)
+{
+}
+
+int PyTraceBack_Check(PyObject *v)
+{        
 }

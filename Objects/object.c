@@ -280,7 +280,21 @@ _PyObject_NewVar(PyTypeObject *tp, Py_ssize_t nitems)
 PyObject *
 PyObject_Repr(PyObject *v)
 {
-    return NULL;
+}
+
+PyObject *
+PyObject_Str(PyObject *v)
+{
+}
+
+PyObject *
+PyObject_ASCII(PyObject *v)
+{
+}
+
+PyObject *
+PyObject_Bytes(PyObject *v)
+{
 }
 
 /* For Python 3.0.1 and later, the old three-way comparison has been

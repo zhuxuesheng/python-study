@@ -29,6 +29,8 @@ REM ** Object **
 %CC% ..\Objects\sliceobject.c
 %CC% ..\Objects\structseq.c
 %CC% ..\Objects\moduleobject.c
+%CC% ..\Objects\bytes_methods.c
+%CC% ..\Objects\exceptions.c
 
 REM ** Python **
 %CC% ..\Python\pyctype.c
@@ -36,6 +38,7 @@ REM ** Python **
 %CC% ..\Python\pystrtod.c
 %CC% ..\Python\dtoa.c
 %CC% ..\Python\modsupport.c
+%CC% ..\Python\errors.c
 
 %CC% test.c
 link /out:test.exe /debug *.obj
