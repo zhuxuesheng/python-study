@@ -89,6 +89,7 @@
 #include "enumobject.h"
 #include "setobject.h"
 #include "methodobject.h"
+#include "moduleobject.h"
 
 #include "sliceobject.h"
 #include "structseq.h"
@@ -101,11 +102,10 @@
 #include "pyctype.h"
 #include "pystrtod.h"
 #include "codecs.h"
-
+#include "modsupport.h"
 
 
 #if 0
-#include "moduleobject.h"
 #include "funcobject.h"
 #include "classobject.h"
 #include "fileobject.h"
@@ -123,7 +123,6 @@
 #include "pystate.h"
 
 #include "pyarena.h"
-#include "modsupport.h"
 #include "pythonrun.h"
 #include "pylifecycle.h"
 #include "sysmodule.h"

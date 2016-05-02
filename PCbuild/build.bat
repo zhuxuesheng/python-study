@@ -28,12 +28,14 @@ REM ** Object **
 %CC% ..\Objects\enumobject.c
 %CC% ..\Objects\sliceobject.c
 %CC% ..\Objects\structseq.c
+%CC% ..\Objects\moduleobject.c
 
 REM ** Python **
 %CC% ..\Python\pyctype.c
 %CC% ..\Python\pyhash.c
 %CC% ..\Python\pystrtod.c
 %CC% ..\Python\dtoa.c
+%CC% ..\Python\modsupport.c
 
 %CC% test.c
 link /out:test.exe /debug *.obj

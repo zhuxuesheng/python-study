@@ -10,6 +10,7 @@ Py_FatalError(const char *msg)
 }
 
 const char *Py_hexdigits = "0123456789abcdef";
+int Py_VerboseFlag;
 
 int main()
 {
@@ -58,6 +59,26 @@ PyOS_snprintf(char *str, size_t size, const  char  *format, ...)
     rc = vsnprintf(str, size, format, va);
     va_end(va);
     return rc;
+}
+
+void
+PySys_WriteStderr(const char *format, ...)
+{
+    va_list va;
+
+    va_start(va, format);
+    vfprintf(stderr, format, va);
+    va_end(va);
+}
+
+void
+PySys_FormatStderr(const char *format, ...)
+{
+    va_list va;
+
+    va_start(va, format);
+    //sys_format(&PyId_stderr, stderr, format, va);
+    va_end(va);
 }
 
 PyObject *
@@ -160,6 +181,11 @@ PyErr_Clear(void)
 {
 }
 
+void
+PyErr_Restore(PyObject *type, PyObject *value, PyObject *traceback)
+{
+}
+
 PyObject *
 PyUnicode_New(Py_ssize_t size, Py_UCS4 maxchar)
 {
@@ -180,6 +206,7 @@ PyUnicode_FromStringAndSize(const char *u, Py_ssize_t size)
 PyObject *PyExc_OverflowError, *PyExc_TypeError, *PyExc_ValueError, *PyExc_ZeroDivisionError, *PyExc_DeprecationWarning;
 PyObject *PyExc_IndexError, *PyExc_SystemError, *PyExc_BufferError, *PyExc_StopIteration, *PyExc_AttributeError;
 PyObject *PyExc_KeyError, *PyExc_MemoryError, *PyExc_RuntimeError, *PyExc_ImportError, *PyExc_NotImplementedError;
+PyObject *PyExc_RuntimeWarning;
 
 PyTypeObject PyType_Type; // wait type module
 PyGC_Head *_PyGC_generation0;
@@ -200,13 +227,6 @@ PyObject *
 PyType_GenericNew(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     return type->tp_alloc(type, 0);
-}
-
-PyObject *
-Py_BuildValue(const char *format, ...)
-{
-    printf("Py_BuildValue is not supported...\n");
-    return NULL;
 }
 
 void
@@ -312,16 +332,6 @@ PyEval_GetLocals(void)
 }
 
 PyObject *
-Py_VaBuildValue(const char *format, va_list va)
-{
-}
-
-PyObject *
-_Py_VaBuildValue_SizeT(const char *format, va_list va)
-{
-}
-
-PyObject *
 PySeqIter_New(PyObject *seq)
 {
 }
@@ -415,6 +425,30 @@ _PyUnicode_FromASCII(const char *buffer, Py_ssize_t size)
 {
 }
 
+int
+PyUnicode_CompareWithASCIIString(PyObject* uni, const char* str)
+{
+}
+
+PyObject *
+PyUnicode_FromUnicode(const Py_UNICODE *u, Py_ssize_t size)
+{
+}
+
+PyObject *
+PyUnicode_FromOrdinal(int ordinal)
+{
+}
+
+size_t
+Py_UNICODE_strlen(const Py_UNICODE *u)
+{
+    int res = 0;
+    while(*u++)
+        res++;
+    return res;
+}
+
 void
 PyObject_ClearWeakRefs(PyObject *object)
 {
@@ -466,5 +500,10 @@ PyType_Ready(PyTypeObject *type)
 
 PyObject *
 _PyType_Lookup(PyTypeObject *type, PyObject *name)
+{
+}
+
+PyObject *
+PyCFunction_NewEx(PyMethodDef *ml, PyObject *self, PyObject *module)
 {
 }
