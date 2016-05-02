@@ -1,5 +1,4 @@
 #include "Python.h"
-#include "frameobject.h"
 #include <stdarg.h>
 #include <ctype.h>
 
@@ -143,6 +142,16 @@ PyType_GenericNew(PyTypeObject *type, PyObject *args, PyObject *kwds)
     return type->tp_alloc(type, 0);
 }
 
+PyObject *
+_PyType_GetDocFromInternalDoc(const char *name, const char *internal_doc)
+{
+}
+
+PyObject *
+_PyType_GetTextSignatureFromInternalDoc(const char *name, const char *internal_doc)
+{
+}
+
 void
 PyObject_GC_Track(void *op)
 {
@@ -200,36 +209,6 @@ PyObject *
 _PyObject_LookupSpecial(PyObject *self, _Py_Identifier *attrid)
 {
     return NULL;
-}
-
-int
-_PyEval_SliceIndex(PyObject *v, Py_ssize_t *pi)
-{
-}
-
-PyObject *
-PyEval_CallObjectWithKeywords(PyObject *func, PyObject *arg, PyObject *kw)
-{
-}
-
-PyObject *
-PyEval_GetLocals(void)
-{
-}
-
-void
-_PyEval_SignalAsyncExc(void)
-{
-}
-
-int
-Py_GetRecursionLimit(void)
-{
-}
-
-PyObject *
-PyEval_EvalFrameEx(PyFrameObject *f, int throwflag)
-{
 }
 
 PyObject *
@@ -299,11 +278,6 @@ _PyType_Lookup(PyTypeObject *type, PyObject *name)
 {
 }
 
-PyObject *
-PyCFunction_NewEx(PyMethodDef *ml, PyObject *self, PyObject *module)
-{
-}
-
 int
 PyFile_WriteString(const char *s, PyObject *f)
 {
@@ -312,15 +286,6 @@ PyFile_WriteString(const char *s, PyObject *f)
 int
 PyFile_WriteObject(PyObject *v, PyObject *f, int flags)
 {
-}
-
-int
-PyTraceBack_Print(PyObject *v, PyObject *f)
-{
-}
-
-int PyTraceBack_Check(PyObject *v)
-{        
 }
 
 PyObject *PyCodec_Encode(PyObject *object,
@@ -367,5 +332,30 @@ Py_DecodeLocale(const char* arg, size_t *size)
 
 void *
 PyCapsule_Import(const char *name, int no_block)
+{
+}
+
+char *
+PyTokenizer_FindEncodingFilename(int fd, PyObject *filename)
+{
+}
+
+int
+PyObject_AsFileDescriptor(PyObject *o)
+{
+}
+
+PyObject *
+PyFile_GetLine(PyObject *f, int n)
+{
+}
+
+Py_ssize_t
+_Py_write_noraise(int fd, const void *buf, size_t count)
+{
+}
+
+PyObject *
+PySys_GetObject(const char *name)
 {
 }

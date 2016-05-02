@@ -1556,6 +1556,11 @@ PyObject _Py_NotImplementedStruct = {
     1, &_PyNotImplemented_Type
 };
 
+void
+_Py_ReadyTypes(void)
+{
+}
+
 
 #ifdef Py_TRACE_REFS
 
@@ -1676,9 +1681,12 @@ Py_ssize_t (*_Py_abstract_hack)(PyObject *) = PyObject_Size;
 void
 _PyObject_DebugTypeStats(FILE *out)
 {
+    _PyCFunction_DebugMallocStats(out);
     _PyDict_DebugMallocStats(out);
     _PyFloat_DebugMallocStats(out);
+    _PyFrame_DebugMallocStats(out);
     _PyList_DebugMallocStats(out);
+    _PyMethod_DebugMallocStats(out);
     _PyTuple_DebugMallocStats(out);
 }
 
