@@ -1,4 +1,5 @@
 #include "Python.h"
+#include "frameobject.h"
 #include <stdarg.h>
 #include <ctype.h>
 
@@ -223,6 +224,11 @@ _PyEval_SignalAsyncExc(void)
 
 int
 Py_GetRecursionLimit(void)
+{
+}
+
+PyObject *
+PyEval_EvalFrameEx(PyFrameObject *f, int throwflag)
 {
 }
 

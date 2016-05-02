@@ -90,8 +90,15 @@
 #include "setobject.h"
 #include "methodobject.h"
 #include "moduleobject.h"
-
+//#include "funcobject.h"
+//#include "classobject.h"
+//#include "fileobject.h"
+//#include "pycapsule.h"
+//#include "traceback.h"
 #include "sliceobject.h"
+#include "cellobject.h"
+//#include "iterobject.h"
+#include "genobject.h"
 #include "structseq.h"
 
 #include "pystate.h"
@@ -107,14 +114,8 @@
 
 
 #if 0
-#include "funcobject.h"
-#include "classobject.h"
-#include "fileobject.h"
-#include "pycapsule.h"
-#include "traceback.h"
-#include "cellobject.h"
-#include "iterobject.h"
-#include "genobject.h"
+
+
 #include "descrobject.h"
 #include "warnings.h"
 #include "weakrefobject.h"

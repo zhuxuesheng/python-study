@@ -8,6 +8,8 @@
 extern "C" {
 #endif
 
+#include "code.h"
+
 typedef struct {
     int b_type;                 /* what kind of block this is */
     int b_handler;              /* where to jump to find handler */
@@ -17,7 +19,7 @@ typedef struct {
 typedef struct _frame {
     PyObject_VAR_HEAD
     struct _frame *f_back;      /* previous frame, or NULL */
-    PyObject *f_code;       /* code segment */
+    PyCodeObject *f_code;       /* code segment */
     PyObject *f_builtins;       /* builtin symbol table (PyDictObject) */
     PyObject *f_globals;        /* global symbol table (PyDictObject) */
     PyObject *f_locals;         /* local symbol table (any mapping) */
@@ -48,7 +50,7 @@ typedef struct _frame {
     int f_lineno;               /* Current line number */
     int f_iblock;               /* index in f_blockstack */
     char f_executing;           /* whether the frame is still executing */
-    PyTryBlock f_blockstack[1]; /* for try and loop blocks */
+    PyTryBlock f_blockstack[CO_MAXBLOCKS]; /* for try and loop blocks */
     PyObject *f_localsplus[1];  /* locals+stack, dynamically sized */
 } PyFrameObject;
 
@@ -59,6 +61,8 @@ PyAPI_DATA(PyTypeObject) PyFrame_Type;
 
 #define PyFrame_Check(op) (Py_TYPE(op) == &PyFrame_Type)
 
+PyAPI_FUNC(PyFrameObject *) PyFrame_New(PyThreadState *, PyCodeObject *,
+                                       PyObject *, PyObject *);
 
 
 /* The rest of the interface is specific for frame objects */

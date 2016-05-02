@@ -34,6 +34,9 @@ REM ** Object **
 %CC% ..\Objects\unicodectype.c
 %CC% ..\Objects\unicodeobject.c
 %CC% ..\Objects\codeobject.c
+%CC% ..\Objects\frameobject.c
+%CC% ..\Objects\cellobject.c
+%CC% ..\Objects\genobject.c
 
 REM ** Python **
 %CC% ..\Python\pyctype.c
