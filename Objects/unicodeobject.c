@@ -14951,11 +14951,11 @@ int _PyUnicode_Init(void)
     if (PyType_Ready(&EncodingMapType) < 0)
          Py_FatalError("Can't initialize encoding map type");
 
-//    if (PyType_Ready(&PyFieldNameIter_Type) < 0)
-//        Py_FatalError("Can't initialize field name iterator type");
+    if (PyType_Ready(&PyFieldNameIter_Type) < 0)
+        Py_FatalError("Can't initialize field name iterator type");
 
-//    if (PyType_Ready(&PyFormatterIter_Type) < 0)
-//        Py_FatalError("Can't initialize formatter iter type");
+    if (PyType_Ready(&PyFormatterIter_Type) < 0)
+        Py_FatalError("Can't initialize formatter iter type");
 
     return 0;
 }
@@ -15020,13 +15020,13 @@ PyUnicode_InternInPlace(PyObject **p)
         return;
     }
 
-    //PyThreadState_GET()->recursion_critical = 1;
+    PyThreadState_GET()->recursion_critical = 1;
     if (PyDict_SetItem(interned, s, s) < 0) {
         PyErr_Clear();
-        //PyThreadState_GET()->recursion_critical = 0;
+        PyThreadState_GET()->recursion_critical = 0;
         return;
     }
-    //PyThreadState_GET()->recursion_critical = 0;
+    PyThreadState_GET()->recursion_critical = 0;
     /* The two references in interned are not counted by refcnt.
        The deallocator will take care of this */
     Py_REFCNT(s) -= 2;

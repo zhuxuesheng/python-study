@@ -1044,7 +1044,7 @@ PyDict_GetItem(PyObject *op, PyObject *key)
     Py_hash_t hash;
     PyDictObject *mp = (PyDictObject *)op;
     PyDictKeyEntry *ep;
-    //PyThreadState *tstate;
+    PyThreadState *tstate;
     PyObject **value_addr;
 
     if (!PyDict_Check(op))
@@ -1059,6 +1059,30 @@ PyDict_GetItem(PyObject *op, PyObject *key)
         }
     }
 
+    /* We can arrive here with a NULL tstate during initialization: try
+       running "python -Wi" for an example related to string interning.
+       Let's just hope that no exception occurs then...  This must be
+       _PyThreadState_Current and not PyThreadState_GET() because in debug
+       mode, the latter complains if tstate is NULL. */
+    tstate = (PyThreadState*)_Py_atomic_load_relaxed(
+        &_PyThreadState_Current);
+    if (tstate != NULL && tstate->curexc_type != NULL) {
+        /* preserve the existing exception */
+        PyObject *err_type, *err_value, *err_tb;
+        PyErr_Fetch(&err_type, &err_value, &err_tb);
+        ep = (mp->ma_keys->dk_lookup)(mp, key, hash, &value_addr);
+        /* ignore errors */
+        PyErr_Restore(err_type, err_value, err_tb);
+        if (ep == NULL)
+            return NULL;
+    }
+    else {
+        ep = (mp->ma_keys->dk_lookup)(mp, key, hash, &value_addr);
+        if (ep == NULL) {
+            PyErr_Clear();
+            return NULL;
+        }
+    }
     return *value_addr;
 }
 
@@ -1067,13 +1091,30 @@ _PyDict_GetItem_KnownHash(PyObject *op, PyObject *key, Py_hash_t hash)
 {
     PyDictObject *mp = (PyDictObject *)op;
     PyDictKeyEntry *ep;
-    //PyThreadState *tstate;
+    PyThreadState *tstate;
     PyObject **value_addr;
 
     if (!PyDict_Check(op))
         return NULL;
 
-    {
+    /* We can arrive here with a NULL tstate during initialization: try
+       running "python -Wi" for an example related to string interning.
+       Let's just hope that no exception occurs then...  This must be
+       _PyThreadState_Current and not PyThreadState_GET() because in debug
+       mode, the latter complains if tstate is NULL. */
+    tstate = (PyThreadState*)_Py_atomic_load_relaxed(
+        &_PyThreadState_Current);
+    if (tstate != NULL && tstate->curexc_type != NULL) {
+        /* preserve the existing exception */
+        PyObject *err_type, *err_value, *err_tb;
+        PyErr_Fetch(&err_type, &err_value, &err_tb);
+        ep = (mp->ma_keys->dk_lookup)(mp, key, hash, &value_addr);
+        /* ignore errors */
+        PyErr_Restore(err_type, err_value, err_tb);
+        if (ep == NULL)
+            return NULL;
+    }
+    else {
         ep = (mp->ma_keys->dk_lookup)(mp, key, hash, &value_addr);
         if (ep == NULL) {
             PyErr_Clear();

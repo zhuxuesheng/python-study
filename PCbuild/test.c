@@ -216,6 +216,11 @@ PyEval_GetLocals(void)
 {
 }
 
+void
+_PyEval_SignalAsyncExc(void)
+{
+}
+
 PyObject *
 PySeqIter_New(PyObject *seq)
 {

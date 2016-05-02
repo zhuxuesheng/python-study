@@ -277,24 +277,338 @@ _PyObject_NewVar(PyTypeObject *tp, Py_ssize_t nitems)
     return PyObject_INIT_VAR(op, tp, nitems);
 }
 
+void
+PyObject_CallFinalizer(PyObject *self)
+{
+    PyTypeObject *tp = Py_TYPE(self);
+
+    /* The former could happen on heaptypes created from the C API, e.g.
+       PyType_FromSpec(). */
+    if (!PyType_HasFeature(tp, Py_TPFLAGS_HAVE_FINALIZE) ||
+        tp->tp_finalize == NULL)
+        return;
+    /* tp_finalize should only be called once. */
+    if (PyType_IS_GC(tp) && _PyGC_FINALIZED(self))
+        return;
+
+    tp->tp_finalize(self);
+    if (PyType_IS_GC(tp))
+        _PyGC_SET_FINALIZED(self, 1);
+}
+
+int
+PyObject_CallFinalizerFromDealloc(PyObject *self)
+{
+    Py_ssize_t refcnt;
+
+    /* Temporarily resurrect the object. */
+    if (self->ob_refcnt != 0) {
+        Py_FatalError("PyObject_CallFinalizerFromDealloc called on "
+                      "object with a non-zero refcount");
+    }
+    self->ob_refcnt = 1;
+
+    PyObject_CallFinalizer(self);
+
+    /* Undo the temporary resurrection; can't use DECREF here, it would
+     * cause a recursive call.
+     */
+    assert(self->ob_refcnt > 0);
+    if (--self->ob_refcnt == 0)
+        return 0;         /* this is the normal path out */
+
+    /* tp_finalize resurrected it!  Make it look like the original Py_DECREF
+     * never happened.
+     */
+    refcnt = self->ob_refcnt;
+    _Py_NewReference(self);
+    self->ob_refcnt = refcnt;
+
+    if (PyType_IS_GC(Py_TYPE(self))) {
+        assert(_PyGC_REFS(self) != _PyGC_REFS_UNTRACKED);
+    }
+    /* If Py_REF_DEBUG, _Py_NewReference bumped _Py_RefTotal, so
+     * we need to undo that. */
+    _Py_DEC_REFTOTAL;
+    /* If Py_TRACE_REFS, _Py_NewReference re-added self to the object
+     * chain, so no more to do there.
+     * If COUNT_ALLOCS, the original decref bumped tp_frees, and
+     * _Py_NewReference bumped tp_allocs:  both of those need to be
+     * undone.
+     */
+#ifdef COUNT_ALLOCS
+    --Py_TYPE(self)->tp_frees;
+    --Py_TYPE(self)->tp_allocs;
+#endif
+    return -1;
+}
+
+int
+PyObject_Print(PyObject *op, FILE *fp, int flags)
+{
+    int ret = 0;
+    if (PyErr_CheckSignals())
+        return -1;
+#ifdef USE_STACKCHECK
+    if (PyOS_CheckStack()) {
+        PyErr_SetString(PyExc_MemoryError, "stack overflow");
+        return -1;
+    }
+#endif
+    clearerr(fp); /* Clear any previous error condition */
+    if (op == NULL) {
+        Py_BEGIN_ALLOW_THREADS
+        fprintf(fp, "<nil>");
+        Py_END_ALLOW_THREADS
+    }
+    else {
+        if (op->ob_refcnt <= 0)
+            /* XXX(twouters) cast refcount to long until %zd is
+               universally available */
+            Py_BEGIN_ALLOW_THREADS
+            fprintf(fp, "<refcnt %ld at %p>",
+                (long)op->ob_refcnt, op);
+            Py_END_ALLOW_THREADS
+        else {
+            PyObject *s;
+            if (flags & Py_PRINT_RAW)
+                s = PyObject_Str(op);
+            else
+                s = PyObject_Repr(op);
+            if (s == NULL)
+                ret = -1;
+            else if (PyBytes_Check(s)) {
+                fwrite(PyBytes_AS_STRING(s), 1,
+                       PyBytes_GET_SIZE(s), fp);
+            }
+            else if (PyUnicode_Check(s)) {
+                PyObject *t;
+                t = PyUnicode_AsEncodedString(s, "utf-8", "backslashreplace");
+                if (t == NULL)
+                    ret = 0;
+                else {
+                    fwrite(PyBytes_AS_STRING(t), 1,
+                           PyBytes_GET_SIZE(t), fp);
+                    Py_DECREF(t);
+                }
+            }
+            else {
+                PyErr_Format(PyExc_TypeError,
+                             "str() or repr() returned '%.100s'",
+                             s->ob_type->tp_name);
+                ret = -1;
+            }
+            Py_XDECREF(s);
+        }
+    }
+    if (ret == 0) {
+        if (ferror(fp)) {
+            PyErr_SetFromErrno(PyExc_IOError);
+            clearerr(fp);
+            ret = -1;
+        }
+    }
+    return ret;
+}
+
+/* For debugging convenience.  Set a breakpoint here and call it from your DLL */
+void
+_Py_BreakPoint(void)
+{
+}
+
+
+/* For debugging convenience.  See Misc/gdbinit for some useful gdb hooks */
+void
+_PyObject_Dump(PyObject* op)
+{
+    if (op == NULL)
+        fprintf(stderr, "NULL\n");
+    else {
+#ifdef WITH_THREAD
+        PyGILState_STATE gil;
+#endif
+        PyObject *error_type, *error_value, *error_traceback;
+
+        fprintf(stderr, "object  : ");
+#ifdef WITH_THREAD
+        gil = PyGILState_Ensure();
+#endif
+
+        PyErr_Fetch(&error_type, &error_value, &error_traceback);
+        (void)PyObject_Print(op, stderr, 0);
+        PyErr_Restore(error_type, error_value, error_traceback);
+
+#ifdef WITH_THREAD
+        PyGILState_Release(gil);
+#endif
+        /* XXX(twouters) cast refcount to long until %zd is
+           universally available */
+        fprintf(stderr, "\n"
+            "type    : %s\n"
+            "refcount: %ld\n"
+            "address : %p\n",
+            Py_TYPE(op)==NULL ? "NULL" : Py_TYPE(op)->tp_name,
+            (long)op->ob_refcnt,
+            op);
+    }
+}
+
 PyObject *
 PyObject_Repr(PyObject *v)
 {
+    PyObject *res;
+    if (PyErr_CheckSignals())
+        return NULL;
+#ifdef USE_STACKCHECK
+    if (PyOS_CheckStack()) {
+        PyErr_SetString(PyExc_MemoryError, "stack overflow");
+        return NULL;
+    }
+#endif
+    if (v == NULL)
+        return PyUnicode_FromString("<NULL>");
+    if (Py_TYPE(v)->tp_repr == NULL)
+        return PyUnicode_FromFormat("<%s object at %p>",
+                                    v->ob_type->tp_name, v);
+
+#ifdef Py_DEBUG
+    /* PyObject_Repr() must not be called with an exception set,
+       because it may clear it (directly or indirectly) and so the
+       caller loses its exception */
+    assert(!PyErr_Occurred());
+#endif
+
+    res = (*v->ob_type->tp_repr)(v);
+    if (res == NULL)
+        return NULL;
+    if (!PyUnicode_Check(res)) {
+        PyErr_Format(PyExc_TypeError,
+                     "__repr__ returned non-string (type %.200s)",
+                     res->ob_type->tp_name);
+        Py_DECREF(res);
+        return NULL;
+    }
+#ifndef Py_DEBUG
+    if (PyUnicode_READY(res) < 0)
+        return NULL;
+#endif
+    return res;
 }
 
 PyObject *
 PyObject_Str(PyObject *v)
 {
+    PyObject *res;
+    if (PyErr_CheckSignals())
+        return NULL;
+#ifdef USE_STACKCHECK
+    if (PyOS_CheckStack()) {
+        PyErr_SetString(PyExc_MemoryError, "stack overflow");
+        return NULL;
+    }
+#endif
+    if (v == NULL)
+        return PyUnicode_FromString("<NULL>");
+    if (PyUnicode_CheckExact(v)) {
+#ifndef Py_DEBUG
+        if (PyUnicode_READY(v) < 0)
+            return NULL;
+#endif
+        Py_INCREF(v);
+        return v;
+    }
+    if (Py_TYPE(v)->tp_str == NULL)
+        return PyObject_Repr(v);
+
+#ifdef Py_DEBUG
+    /* PyObject_Str() must not be called with an exception set,
+       because it may clear it (directly or indirectly) and so the
+       caller loses its exception */
+    assert(!PyErr_Occurred());
+#endif
+
+    /* It is possible for a type to have a tp_str representation that loops
+       infinitely. */
+    if (Py_EnterRecursiveCall(" while getting the str of an object"))
+        return NULL;
+    res = (*Py_TYPE(v)->tp_str)(v);
+    Py_LeaveRecursiveCall();
+    if (res == NULL)
+        return NULL;
+    if (!PyUnicode_Check(res)) {
+        PyErr_Format(PyExc_TypeError,
+                     "__str__ returned non-string (type %.200s)",
+                     Py_TYPE(res)->tp_name);
+        Py_DECREF(res);
+        return NULL;
+    }
+#ifndef Py_DEBUG
+    if (PyUnicode_READY(res) < 0)
+        return NULL;
+#endif
+    assert(_PyUnicode_CheckConsistency(res, 1));
+    return res;
 }
 
 PyObject *
 PyObject_ASCII(PyObject *v)
 {
+    PyObject *repr, *ascii, *res;
+
+    repr = PyObject_Repr(v);
+    if (repr == NULL)
+        return NULL;
+
+    if (PyUnicode_IS_ASCII(repr))
+        return repr;
+
+    /* repr is guaranteed to be a PyUnicode object by PyObject_Repr */
+    ascii = _PyUnicode_AsASCIIString(repr, "backslashreplace");
+    Py_DECREF(repr);
+    if (ascii == NULL)
+        return NULL;
+
+    res = PyUnicode_DecodeASCII(
+        PyBytes_AS_STRING(ascii),
+        PyBytes_GET_SIZE(ascii),
+        NULL);
+
+    Py_DECREF(ascii);
+    return res;
 }
 
 PyObject *
 PyObject_Bytes(PyObject *v)
 {
+    PyObject *result, *func;
+
+    if (v == NULL)
+        return PyBytes_FromString("<NULL>");
+
+    if (PyBytes_CheckExact(v)) {
+        Py_INCREF(v);
+        return v;
+    }
+
+    func = _PyObject_LookupSpecial(v, &PyId___bytes__);
+    if (func != NULL) {
+        result = PyObject_CallFunctionObjArgs(func, NULL);
+        Py_DECREF(func);
+        if (result == NULL)
+            return NULL;
+        if (!PyBytes_Check(result)) {
+            PyErr_Format(PyExc_TypeError,
+                         "__bytes__ returned non-bytes (type %.200s)",
+                         Py_TYPE(result)->tp_name);
+            Py_DECREF(result);
+            return NULL;
+        }
+        return result;
+    }
+    else if (PyErr_Occurred())
+        return NULL;
+    return PyBytes_FromObject(v);
 }
 
 /* For Python 3.0.1 and later, the old three-way comparison has been
@@ -1383,12 +1697,151 @@ _PyObject_DebugTypeStats(FILE *out)
 int
 Py_ReprEnter(PyObject *obj)
 {
+    PyObject *dict;
+    PyObject *list;
+    Py_ssize_t i;
+
+    dict = PyThreadState_GetDict();
+    /* Ignore a missing thread-state, so that this function can be called
+       early on startup. */
+    if (dict == NULL)
+        return 0;
+    list = _PyDict_GetItemId(dict, &PyId_Py_Repr);
+    if (list == NULL) {
+        list = PyList_New(0);
+        if (list == NULL)
+            return -1;
+        if (_PyDict_SetItemId(dict, &PyId_Py_Repr, list) < 0)
+            return -1;
+        Py_DECREF(list);
+    }
+    i = PyList_GET_SIZE(list);
+    while (--i >= 0) {
+        if (PyList_GET_ITEM(list, i) == obj)
+            return 1;
+    }
+    if (PyList_Append(list, obj) < 0)
+        return -1;
     return 0;
 }
 
 void
 Py_ReprLeave(PyObject *obj)
 {
+    PyObject *dict;
+    PyObject *list;
+    Py_ssize_t i;
+    PyObject *error_type, *error_value, *error_traceback;
+
+    PyErr_Fetch(&error_type, &error_value, &error_traceback);
+
+    dict = PyThreadState_GetDict();
+    if (dict == NULL)
+        goto finally;
+
+    list = _PyDict_GetItemId(dict, &PyId_Py_Repr);
+    if (list == NULL || !PyList_Check(list))
+        goto finally;
+
+    i = PyList_GET_SIZE(list);
+    /* Count backwards because we always expect obj to be list[-1] */
+    while (--i >= 0) {
+        if (PyList_GET_ITEM(list, i) == obj) {
+            PyList_SetSlice(list, i, i + 1, NULL);
+            break;
+        }
+    }
+
+finally:
+    /* ignore exceptions because there is no way to report them. */
+    PyErr_Restore(error_type, error_value, error_traceback);
+}
+
+/* Trashcan support. */
+
+/* Current call-stack depth of tp_dealloc calls. */
+int _PyTrash_delete_nesting = 0;
+
+/* List of objects that still need to be cleaned up, singly linked via their
+ * gc headers' gc_prev pointers.
+ */
+PyObject *_PyTrash_delete_later = NULL;
+
+/* Add op to the _PyTrash_delete_later list.  Called when the current
+ * call-stack depth gets large.  op must be a currently untracked gc'ed
+ * object, with refcount 0.  Py_DECREF must already have been called on it.
+ */
+void
+_PyTrash_deposit_object(PyObject *op)
+{
+    assert(PyObject_IS_GC(op));
+    assert(_PyGC_REFS(op) == _PyGC_REFS_UNTRACKED);
+    assert(op->ob_refcnt == 0);
+    _Py_AS_GC(op)->gc.gc_prev = (PyGC_Head *)_PyTrash_delete_later;
+    _PyTrash_delete_later = op;
+}
+
+/* The equivalent API, using per-thread state recursion info */
+void
+_PyTrash_thread_deposit_object(PyObject *op)
+{
+    PyThreadState *tstate = PyThreadState_GET();
+    assert(PyObject_IS_GC(op));
+    assert(_PyGC_REFS(op) == _PyGC_REFS_UNTRACKED);
+    assert(op->ob_refcnt == 0);
+    _Py_AS_GC(op)->gc.gc_prev = (PyGC_Head *) tstate->trash_delete_later;
+    tstate->trash_delete_later = op;
+}
+
+/* Dealloccate all the objects in the _PyTrash_delete_later list.  Called when
+ * the call-stack unwinds again.
+ */
+void
+_PyTrash_destroy_chain(void)
+{
+    while (_PyTrash_delete_later) {
+        PyObject *op = _PyTrash_delete_later;
+        destructor dealloc = Py_TYPE(op)->tp_dealloc;
+
+        _PyTrash_delete_later =
+            (PyObject*) _Py_AS_GC(op)->gc.gc_prev;
+
+        /* Call the deallocator directly.  This used to try to
+         * fool Py_DECREF into calling it indirectly, but
+         * Py_DECREF was already called on this object, and in
+         * assorted non-release builds calling Py_DECREF again ends
+         * up distorting allocation statistics.
+         */
+        assert(op->ob_refcnt == 0);
+        ++_PyTrash_delete_nesting;
+        (*dealloc)(op);
+        --_PyTrash_delete_nesting;
+    }
+}
+
+/* The equivalent API, using per-thread state recursion info */
+void
+_PyTrash_thread_destroy_chain(void)
+{
+    PyThreadState *tstate = PyThreadState_GET();
+    while (tstate->trash_delete_later) {
+        PyObject *op = tstate->trash_delete_later;
+        destructor dealloc = Py_TYPE(op)->tp_dealloc;
+
+        tstate->trash_delete_later =
+            (PyObject*) _Py_AS_GC(op)->gc.gc_prev;
+
+        /* Call the deallocator directly.  This used to try to
+         * fool Py_DECREF into calling it indirectly, but
+         * Py_DECREF was already called on this object, and in
+         * assorted non-release builds calling Py_DECREF again ends
+         * up distorting allocation statistics.
+         */
+        assert(op->ob_refcnt == 0);
+        ++tstate->trash_delete_nesting;
+        (*dealloc)(op);
+        --tstate->trash_delete_nesting;
+    }
 }
 
 #ifndef Py_TRACE_REFS

@@ -136,7 +136,9 @@ PyModule_Create2(struct PyModuleDef* module, int module_api_version)
 {
     const char* name;
     PyModuleObject *m;
-
+    PyInterpreterState *interp = PyThreadState_Get()->interp;
+    if (interp->modules == NULL)
+        Py_FatalError("Python import machinery not initialized");
     if (!PyModuleDef_Init(module))
         return NULL;
     name = module->m_name;
@@ -644,6 +646,10 @@ module_dealloc(PyModuleObject *m)
 static PyObject *
 module_repr(PyModuleObject *m)
 {
+    PyThreadState *tstate = PyThreadState_GET();
+    PyInterpreterState *interp = tstate->interp;
+
+    return PyObject_CallMethod(interp->importlib, "_module_repr", "O", m);
 }
 
 static PyObject*

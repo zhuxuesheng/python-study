@@ -94,6 +94,7 @@
 #include "sliceobject.h"
 #include "structseq.h"
 
+#include "pystate.h"
 #include "descrobject.h"
 #include "pyerrors.h"
 #include "abstract.h"

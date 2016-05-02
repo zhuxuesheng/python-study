@@ -328,6 +328,39 @@ range_item(rangeobject *r, Py_ssize_t i)
 static PyObject *
 compute_slice(rangeobject *r, PyObject *_slice)
 {
+    PySliceObject *slice = (PySliceObject *) _slice;
+    rangeobject *result;
+    PyObject *start = NULL, *stop = NULL, *step = NULL;
+    PyObject *substart = NULL, *substop = NULL, *substep = NULL;
+    int error;
+
+    error = _PySlice_GetLongIndices(slice, r->length, &start, &stop, &step);
+    if (error == -1)
+        return NULL;
+
+    substep = PyNumber_Multiply(r->step, step);
+    if (substep == NULL) goto fail;
+    Py_CLEAR(step);
+
+    substart = compute_item(r, start);
+    if (substart == NULL) goto fail;
+    Py_CLEAR(start);
+
+    substop = compute_item(r, stop);
+    if (substop == NULL) goto fail;
+    Py_CLEAR(stop);
+
+    result = make_range_object(Py_TYPE(r), substart, substop, substep);
+    if (result != NULL) {
+        return (PyObject *) result;
+    }
+fail:
+    Py_XDECREF(start);
+    Py_XDECREF(stop);
+    Py_XDECREF(step);
+    Py_XDECREF(substart);
+    Py_XDECREF(substop);
+    Py_XDECREF(substep);
     return NULL;
 }
 
