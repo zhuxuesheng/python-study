@@ -531,3 +531,9 @@ PyBytes_Fini(void)
         Py_CLEAR(characters[i]);
     Py_CLEAR(nullstring);
 }
+
+PyObject *
+PyBytes_FromObject(PyObject *x)
+{
+    return NULL;
+}

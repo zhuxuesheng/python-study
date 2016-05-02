@@ -99,26 +99,14 @@ PyErr_WarnFormat(PyObject *category, Py_ssize_t stack_level,
 }
 
 int
+PyErr_WarnEx(PyObject *category, const char *text, Py_ssize_t stack_level)
+{
+}
+
+int
 PyErr_CheckSignals(void)
 {
     return 0;
-}
-
-PyObject *
-PyUnicode_New(Py_ssize_t size, Py_UCS4 maxchar)
-{
-}
-
-PyObject *
-PyUnicode_FromString(const char *u)
-{
-    return NULL;
-}
-
-PyObject *
-PyUnicode_FromStringAndSize(const char *u, Py_ssize_t size)
-{
-    return NULL;
 }
 
 PyObject *PyExc_OverflowError, *PyExc_TypeError, *PyExc_ValueError, *PyExc_ZeroDivisionError, *PyExc_DeprecationWarning;
@@ -267,165 +255,6 @@ PySeqIter_New(PyObject *seq)
 {
 }
 
-PyTypeObject PyUnicode_Type;
-
-int
-_PyUnicode_Ready(PyObject *unicode)
-{
-}
-
-PyObject *
-PyUnicode_FromFormat(const char *format, ...)
-{
-}
-
-PyObject *
-PyUnicode_FromFormatV(const char *format, va_list vargs)
-{
-}
-
-PyObject *
-PyUnicode_FromWideChar(const wchar_t *w, Py_ssize_t size)
-{
-}
-
-PyObject*
-PyUnicode_DecodeFSDefault(const char *s) {
-}
-
-void
-PyUnicode_InternInPlace(PyObject **p)
-{
-}
-
-PyObject *
-_PyUnicode_FromId(_Py_Identifier *id)
-{
-}
-
-int
-_PyUnicode_CompareWithId(PyObject *left, _Py_Identifier *right)
-{
-}
-
-PyObject*
-PyUnicode_Substring(PyObject *self, Py_ssize_t start, Py_ssize_t end)
-{
-}
-
-PyObject *
-PyUnicode_AsASCIIString(PyObject *unicode)
-{
-}
-
-PyObject *
-PyUnicode_InternFromString(const char *cp)
-{
-}
-
-void
-_PyUnicodeWriter_Init(_PyUnicodeWriter *writer)
-{
-}
-
-PyObject *
-_PyUnicodeWriter_Finish(_PyUnicodeWriter *writer)
-{
-}
-
-void
-_PyUnicodeWriter_Dealloc(_PyUnicodeWriter *writer)
-{
-    Py_CLEAR(writer->buffer);
-}
-
-int
-_PyUnicodeWriter_WriteChar(_PyUnicodeWriter *writer, Py_UCS4 ch)
-{
-}
-
-int
-_PyUnicodeWriter_WriteStr(_PyUnicodeWriter *writer, PyObject *str)
-{
-}
-
-int
-_PyUnicodeWriter_WriteASCIIString(_PyUnicodeWriter *writer,
-                                  const char *ascii, Py_ssize_t len)
-{
-}
-
-char*
-PyUnicode_AsUTF8(PyObject *unicode)
-{
-}
-
-char*
-PyUnicode_AsUTF8AndSize(PyObject *unicode, Py_ssize_t *psize)
-{
-}
-
-PyObject *
-_PyUnicode_TransformDecimalAndSpaceToASCII(PyObject *unicode)
-{
-}
-
-PyObject*
-_PyUnicode_FromASCII(const char *buffer, Py_ssize_t size)
-{
-}
-
-int
-PyUnicode_CompareWithASCIIString(PyObject* uni, const char* str)
-{
-}
-
-PyObject *
-PyUnicode_FromUnicode(const Py_UNICODE *u, Py_ssize_t size)
-{
-}
-
-PyObject *
-PyUnicode_FromOrdinal(int ordinal)
-{
-}
-
-size_t
-Py_UNICODE_strlen(const Py_UNICODE *u)
-{
-    int res = 0;
-    while(*u++)
-        res++;
-    return res;
-}
-
-Py_UCS4
-PyUnicode_ReadChar(PyObject *unicode, Py_ssize_t index)
-{
-}
-
-Py_ssize_t
-PyUnicode_Tailmatch(PyObject *str,
-                    PyObject *substr,
-                    Py_ssize_t start,
-                    Py_ssize_t end,
-                    int direction)
-{
-}
-
-Py_ssize_t
-PyUnicode_FindChar(PyObject *str, Py_UCS4 ch,
-                   Py_ssize_t start, Py_ssize_t end,
-                   int direction)
-{
-}
-
-int _PyUnicode_IsWhitespace(const Py_UCS4 ch)
-{
-}
-
-const unsigned char _Py_ascii_whitespace[10];
-
 void
 PyObject_ClearWeakRefs(PyObject *object)
 {
@@ -471,6 +300,14 @@ _PyFloat_FormatAdvancedWriter(_PyUnicodeWriter *writer,
 }
 
 int
+_PyUnicode_FormatAdvancedWriter(_PyUnicodeWriter *writer,
+                                PyObject *obj,
+                                PyObject *format_spec,
+                                Py_ssize_t start, Py_ssize_t end)
+{
+}
+
+int
 PyType_Ready(PyTypeObject *type)
 {
 }
@@ -502,4 +339,51 @@ PyTraceBack_Print(PyObject *v, PyObject *f)
 
 int PyTraceBack_Check(PyObject *v)
 {        
+}
+
+PyObject *PyCodec_Encode(PyObject *object,
+                         const char *encoding,
+                         const char *errors)
+{
+}
+
+PyObject *PyCodec_Decode(PyObject *object,
+                         const char *encoding,
+                         const char *errors)
+{
+}
+
+PyObject *_PyCodec_EncodeText(PyObject *object,
+                              const char *encoding,
+                              const char *errors)
+{
+}
+
+PyObject *_PyCodec_DecodeText(PyObject *object,
+                              const char *encoding,
+                              const char *errors)
+{
+}
+
+PyObject *PyCodec_LookupError(const char *name)
+{
+}
+
+PyObject *PyCodec_StrictErrors(PyObject *exc)
+{
+}
+
+char*
+Py_EncodeLocale(const wchar_t *text, size_t *error_pos)
+{
+}
+
+wchar_t*
+Py_DecodeLocale(const char* arg, size_t *size)
+{
+}
+
+void *
+PyCapsule_Import(const char *name, int no_block)
+{
 }

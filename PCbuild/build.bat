@@ -31,6 +31,8 @@ REM ** Object **
 %CC% ..\Objects\moduleobject.c
 %CC% ..\Objects\bytes_methods.c
 %CC% ..\Objects\exceptions.c
+%CC% ..\Objects\unicodectype.c
+%CC% ..\Objects\unicodeobject.c
 
 REM ** Python **
 %CC% ..\Python\pyctype.c
