@@ -88,23 +88,6 @@ PySys_FormatStderr(const char *format, ...)
 }
 
 int
-PyErr_WarnFormat(PyObject *category, Py_ssize_t stack_level,
-                 const char *format, ...)
-{
-    va_list va;
-    
-    va_start(va, format);
-    printf(format, va);
-    va_end(va);
-    return 0;
-}
-
-int
-PyErr_WarnEx(PyObject *category, const char *text, Py_ssize_t stack_level)
-{
-}
-
-int
 PyErr_CheckSignals(void)
 {
     return 0;
@@ -209,11 +192,6 @@ PyObject *
 _PyObject_LookupSpecial(PyObject *self, _Py_Identifier *attrid)
 {
     return NULL;
-}
-
-void
-PyObject_ClearWeakRefs(PyObject *object)
-{
 }
 
 PyObject *
@@ -324,4 +302,9 @@ PyObject *
 PyImport_ImportModuleNoBlock(const char *name)
 {
     return NULL;
+}
+
+PyObject *
+PyImport_GetModuleDict(void)
+{
 }

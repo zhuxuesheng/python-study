@@ -5075,6 +5075,8 @@ import_from(PyObject *v, PyObject *name)
     if (fullmodname == NULL) {
         return NULL;
     }
+    x = PyDict_GetItem(PyImport_GetModuleDict(), fullmodname);
+    Py_DECREF(fullmodname);
     if (x == NULL) {
         goto error;
     }

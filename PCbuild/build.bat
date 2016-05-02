@@ -42,6 +42,7 @@ REM ** Object **
 %CC% ..\Objects\classobject.c
 %CC% ..\Objects\fileobject.c
 %CC% ..\Objects\iterobject.c
+%CC% ..\Objects\weakrefobject.c
 
 REM ** Python **
 %CC% ..\Python\pyctype.c
@@ -55,6 +56,7 @@ REM ** Python **
 %CC% ..\Python\ceval.c
 %CC% ..\Python\traceback.c
 %CC% ..\Python\fileutils.c
+%CC% ..\Python\_warnings.c
 
 %CC% test.c
 link /out:test.exe /debug *.obj
