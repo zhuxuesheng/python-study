@@ -33,6 +33,7 @@ REM ** Object **
 %CC% ..\Objects\exceptions.c
 %CC% ..\Objects\unicodectype.c
 %CC% ..\Objects\unicodeobject.c
+%CC% ..\Objects\codeobject.c
 
 REM ** Python **
 %CC% ..\Python\pyctype.c

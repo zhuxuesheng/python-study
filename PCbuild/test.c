@@ -221,6 +221,11 @@ _PyEval_SignalAsyncExc(void)
 {
 }
 
+int
+Py_GetRecursionLimit(void)
+{
+}
+
 PyObject *
 PySeqIter_New(PyObject *seq)
 {

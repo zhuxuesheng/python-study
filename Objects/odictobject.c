@@ -1484,7 +1484,7 @@ odict_dealloc(PyODictObject *self)
      * to-be-deleted-later list.
      */
     --tstate->trash_delete_nesting;
-    assert(_tstate->trash_delete_nesting < PyTrash_UNWIND_LEVEL);
+    assert(tstate->trash_delete_nesting < PyTrash_UNWIND_LEVEL);
     PyDict_Type.tp_dealloc((PyObject *)self);
     ++tstate->trash_delete_nesting;
 

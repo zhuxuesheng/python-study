@@ -27,11 +27,97 @@ _Py_IDENTIFIER(stderr);
 void
 PyErr_Restore(PyObject *type, PyObject *value, PyObject *traceback)
 {
+    PyThreadState *tstate = PyThreadState_GET();
+    PyObject *oldtype, *oldvalue, *oldtraceback;
+
+    if (traceback != NULL && !PyTraceBack_Check(traceback)) {
+        /* XXX Should never happen -- fatal error instead? */
+        /* Well, it could be None. */
+        Py_DECREF(traceback);
+        traceback = NULL;
+    }
+
+    /* Save these in locals to safeguard against recursive
+       invocation through Py_XDECREF */
+    oldtype = tstate->curexc_type;
+    oldvalue = tstate->curexc_value;
+    oldtraceback = tstate->curexc_traceback;
+
+    tstate->curexc_type = type;
+    tstate->curexc_value = value;
+    tstate->curexc_traceback = traceback;
+
+    Py_XDECREF(oldtype);
+    Py_XDECREF(oldvalue);
+    Py_XDECREF(oldtraceback);
 }
 
 void
 PyErr_SetObject(PyObject *exception, PyObject *value)
 {
+    PyThreadState *tstate = PyThreadState_GET();
+    PyObject *exc_value;
+    PyObject *tb = NULL;
+
+    if (exception != NULL &&
+        !PyExceptionClass_Check(exception)) {
+        PyErr_Format(PyExc_SystemError,
+                     "exception %R not a BaseException subclass",
+                     exception);
+        return;
+    }
+    Py_XINCREF(value);
+    exc_value = tstate->exc_value;
+    if (exc_value != NULL && exc_value != Py_None) {
+        /* Implicit exception chaining */
+        Py_INCREF(exc_value);
+        if (value == NULL || !PyExceptionInstance_Check(value)) {
+            /* We must normalize the value right now */
+            PyObject *args, *fixed_value;
+
+            /* Issue #23571: PyEval_CallObject() must not be called with an
+               exception set */
+            PyErr_Clear();
+
+            if (value == NULL || value == Py_None)
+                args = PyTuple_New(0);
+            else if (PyTuple_Check(value)) {
+                Py_INCREF(value);
+                args = value;
+            }
+            else
+                args = PyTuple_Pack(1, value);
+            fixed_value = args ?
+                PyEval_CallObject(exception, args) : NULL;
+            Py_XDECREF(args);
+            Py_XDECREF(value);
+            if (fixed_value == NULL)
+                return;
+            value = fixed_value;
+        }
+        /* Avoid reference cycles through the context chain.
+           This is O(chain length) but context chains are
+           usually very short. Sensitive readers may try
+           to inline the call to PyException_GetContext. */
+        if (exc_value != value) {
+            PyObject *o = exc_value, *context;
+            while ((context = PyException_GetContext(o))) {
+                Py_DECREF(context);
+                if (context == value) {
+                    PyException_SetContext(o, NULL);
+                    break;
+                }
+                o = context;
+            }
+            PyException_SetContext(value, exc_value);
+        } else {
+            Py_DECREF(exc_value);
+        }
+    }
+    if (value != NULL && PyExceptionInstance_Check(value))
+        tb = PyException_GetTraceback(value);
+    Py_XINCREF(exception);
+    PyErr_Restore(exception, value, tb);
 }
 
 /* Set a key error with the specified argument, wrapping it in a
@@ -66,6 +152,14 @@ PyErr_SetString(PyObject *exception, const char *string)
 PyObject *
 PyErr_Occurred(void)
 {
+    /* If there is no thread state, PyThreadState_GET calls
+       Py_FatalError, which calls PyErr_Occurred.  To avoid the
+       resulting infinite loop, we inline PyThreadState_GET here and
+       treat no thread as no error. */
+    PyThreadState *tstate =
+        ((PyThreadState*)_Py_atomic_load_relaxed(&_PyThreadState_Current));
+
+    return tstate == NULL ? NULL : tstate->curexc_type;
 }
 
 
@@ -133,6 +227,7 @@ PyErr_NormalizeException(PyObject **exc, PyObject **val, PyObject **tb)
     PyObject *value = *val;
     PyObject *inclass = NULL;
     PyObject *initial_tb = NULL;
+    PyThreadState *tstate = NULL;
 
     if (type == NULL) {
         /* There was no exception, so nothing to do. */
@@ -216,12 +311,38 @@ finally:
         else
             Py_DECREF(initial_tb);
     }
+    /* normalize recursively */
+    tstate = PyThreadState_GET();
+    if (++tstate->recursion_depth > Py_GetRecursionLimit()) {
+        --tstate->recursion_depth;
+        /* throw away the old exception... */
+        Py_DECREF(*exc);
+        Py_DECREF(*val);
+        /* ... and use the recursion error instead */
+        *exc = PyExc_RecursionError;
+        *val = PyExc_RecursionErrorInst;
+        Py_INCREF(*exc);
+        Py_INCREF(*val);
+        /* just keeping the old traceback */
+        return;
+    }
+    PyErr_NormalizeException(exc, val, tb);
+    --tstate->recursion_depth;
 }
 
 
 void
 PyErr_Fetch(PyObject **p_type, PyObject **p_value, PyObject **p_traceback)
 {
+    PyThreadState *tstate = PyThreadState_GET();
+
+    *p_type = tstate->curexc_type;
+    *p_value = tstate->curexc_value;
+    *p_traceback = tstate->curexc_traceback;
+
+    tstate->curexc_type = NULL;
+    tstate->curexc_value = NULL;
+    tstate->curexc_traceback = NULL;
 }
 
 void
@@ -233,11 +354,34 @@ PyErr_Clear(void)
 void
 PyErr_GetExcInfo(PyObject **p_type, PyObject **p_value, PyObject **p_traceback)
 {
+    PyThreadState *tstate = PyThreadState_GET();
+
+    *p_type = tstate->exc_type;
+    *p_value = tstate->exc_value;
+    *p_traceback = tstate->exc_traceback;
+
+    Py_XINCREF(*p_type);
+    Py_XINCREF(*p_value);
+    Py_XINCREF(*p_traceback);
 }
 
 void
 PyErr_SetExcInfo(PyObject *p_type, PyObject *p_value, PyObject *p_traceback)
 {
+    PyObject *oldtype, *oldvalue, *oldtraceback;
+    PyThreadState *tstate = PyThreadState_GET();
+
+    oldtype = tstate->exc_type;
+    oldvalue = tstate->exc_value;
+    oldtraceback = tstate->exc_traceback;
+
+    tstate->exc_type = p_type;
+    tstate->exc_value = p_value;
+    tstate->exc_traceback = p_traceback;
+
+    Py_XDECREF(oldtype);
+    Py_XDECREF(oldvalue);
+    Py_XDECREF(oldtraceback);
 }
 
 /* Like PyErr_Restore(), but if an exception is already set,
