@@ -9,7 +9,6 @@ Py_FatalError(const char *msg)
     exit(1);
 }
 
-const char *Py_hexdigits = "0123456789abcdef";
 int Py_VerboseFlag;
 int Py_BytesWarningFlag;
 
@@ -208,38 +207,6 @@ _PyUnicode_FormatAdvancedWriter(_PyUnicodeWriter *writer,
                                 PyObject *obj,
                                 PyObject *format_spec,
                                 Py_ssize_t start, Py_ssize_t end)
-{
-}
-
-PyObject *PyCodec_Encode(PyObject *object,
-                         const char *encoding,
-                         const char *errors)
-{
-}
-
-PyObject *PyCodec_Decode(PyObject *object,
-                         const char *encoding,
-                         const char *errors)
-{
-}
-
-PyObject *_PyCodec_EncodeText(PyObject *object,
-                              const char *encoding,
-                              const char *errors)
-{
-}
-
-PyObject *_PyCodec_DecodeText(PyObject *object,
-                              const char *encoding,
-                              const char *errors)
-{
-}
-
-PyObject *PyCodec_LookupError(const char *name)
-{
-}
-
-PyObject *PyCodec_StrictErrors(PyObject *exc)
 {
 }
 

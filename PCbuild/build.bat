@@ -62,6 +62,7 @@ REM ** Python **
 %CC% ..\Python\fileutils.c
 %CC% ..\Python\_warnings.c
 %CC% ..\Python\structmember.c
+%CC% ..\Python\codecs.c
 
 %CC% test.c
 link /out:test.exe /debug *.obj

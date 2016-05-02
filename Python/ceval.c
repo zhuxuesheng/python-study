@@ -4468,6 +4468,28 @@ PyEval_GetFrame(void)
     return _PyThreadState_GetFrame(tstate);
 }
 
+int
+PyEval_MergeCompilerFlags(PyCompilerFlags *cf)
+{
+    PyFrameObject *current_frame = PyEval_GetFrame();
+    int result = cf->cf_flags != 0;
+
+    if (current_frame != NULL) {
+        const int codeflags = current_frame->f_code->co_flags;
+        const int compilerflags = codeflags & PyCF_MASK;
+        if (compilerflags) {
+            result = 1;
+            cf->cf_flags |= compilerflags;
+        }
+#if 0 /* future keyword */
+        if (codeflags & CO_GENERATOR_ALLOWED) {
+            result = 1;
+            cf->cf_flags |= CO_GENERATOR_ALLOWED;
+        }
+#endif
+    }
+    return result;
+}
 
 
 /* External interface to call any callable object.
