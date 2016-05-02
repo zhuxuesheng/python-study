@@ -92,7 +92,7 @@
 #include "moduleobject.h"
 #include "funcobject.h"
 #include "classobject.h"
-//#include "fileobject.h"
+#include "fileobject.h"
 //#include "pycapsule.h"
 #include "traceback.h"
 #include "sliceobject.h"
@@ -103,7 +103,7 @@
 //#include "warnings.h"
 //#include "weakrefobject.h"
 #include "structseq.h"
-#include "namespaceobject.h"
+//#include "namespaceobject.h"
 
 #include "codecs.h"
 #include "pyerrors.h"
@@ -112,12 +112,16 @@
 
 #include "abstract.h"
 #include "ceval.h"
-#include "pyfpe.h"
-#include "pyctype.h"
-#include "pystrtod.h"
+
+
 
 #include "modsupport.h"
 #include "eval.h"
+
+#include "pyctype.h"
+#include "pystrtod.h"
+#include "fileutils.h"
+#include "pyfpe.h"
 
 #if 0
 #include "pyarena.h"
@@ -133,7 +137,6 @@
 
 #include "pystrcmp.h"
 #include "dtoa.h"
-#include "fileutils.h"
 
 #endif
 #endif /* !Py_PYTHON_H */

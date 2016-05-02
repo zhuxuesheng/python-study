@@ -40,6 +40,7 @@ REM ** Object **
 %CC% ..\Objects\funcobject.c
 %CC% ..\Objects\methodobject.c
 %CC% ..\Objects\classobject.c
+%CC% ..\Objects\fileobject.c
 
 REM ** Python **
 %CC% ..\Python\pyctype.c
@@ -52,6 +53,7 @@ REM ** Python **
 %CC% ..\Python\pystate.c
 %CC% ..\Python\ceval.c
 %CC% ..\Python\traceback.c
+%CC% ..\Python\fileutils.c
 
 %CC% test.c
 link /out:test.exe /debug *.obj

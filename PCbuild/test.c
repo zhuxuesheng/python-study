@@ -278,16 +278,6 @@ _PyType_Lookup(PyTypeObject *type, PyObject *name)
 {
 }
 
-int
-PyFile_WriteString(const char *s, PyObject *f)
-{
-}
-
-int
-PyFile_WriteObject(PyObject *v, PyObject *f, int flags)
-{
-}
-
 PyObject *PyCodec_Encode(PyObject *object,
                          const char *encoding,
                          const char *errors)
@@ -320,16 +310,6 @@ PyObject *PyCodec_StrictErrors(PyObject *exc)
 {
 }
 
-char*
-Py_EncodeLocale(const wchar_t *text, size_t *error_pos)
-{
-}
-
-wchar_t*
-Py_DecodeLocale(const char* arg, size_t *size)
-{
-}
-
 void *
 PyCapsule_Import(const char *name, int no_block)
 {
@@ -337,21 +317,6 @@ PyCapsule_Import(const char *name, int no_block)
 
 char *
 PyTokenizer_FindEncodingFilename(int fd, PyObject *filename)
-{
-}
-
-int
-PyObject_AsFileDescriptor(PyObject *o)
-{
-}
-
-PyObject *
-PyFile_GetLine(PyObject *f, int n)
-{
-}
-
-Py_ssize_t
-_Py_write_noraise(int fd, const void *buf, size_t count)
 {
 }
 
