@@ -15,37 +15,78 @@ extern PyNumberMethods float_as_number;
 
 int main()
 {
-    #ifdef _DEBUG
-    printf("This is debug version...\n");
-    #endif
     printf("Python version: %s, hex: %08X\n", PY_VERSION, PY_VERSION_HEX); //patchlevel.h
-    void *ptr = PyMem_Malloc(1024);
-    PyMem_Free(ptr);
-    
+
     if (!_PyLong_Init())
         Py_FatalError("Py_Initialize: can't init longs");
-    
-    PyObject *x, *y, *z;
-    long result;
-    x = PyLong_FromLong(500);
-    y = PyLong_FromLong(60);
-    z = long_as_number.nb_remainder(x, y);
-    result = PyLong_AsLong(z);
-    printf("1+2=%d\n", result);
-    
-    PyObject *t, *f, *zz;
-    t = PyBool_FromLong(1);
-    f = PyBool_FromLong(0);
-    zz = bool_as_number.nb_and(t, f);
-    printf("True and False is %s\n", (zz==Py_True)?("True"):("False"));
-    
-    PyObject *f1, *f2, *f3;
-    f1 = PyFloat_FromDouble(10.5);
-    f2 = PyFloat_FromDouble(15.4);
-    f3 = float_as_number.nb_multiply(f1, f2);
-    double d = PyFloat_AsDouble(f3);
-    printf("10.5*15.4 = %f\n", d);
-    
+
+    {
+        PyObject *n1 = PyLong_FromLong(2);
+        PyObject *res = long_as_number.nb_add(n1, n1);
+        printf(">>> 2 + 2 \n%d\n", PyLong_AsLong(res));
+    }
+
+    {
+        PyObject *n1 = PyLong_FromLong(50);
+        PyObject *n2 = PyLong_FromLong(5);
+        PyObject *n3 = PyLong_FromLong(6);
+        PyObject *res = long_as_number.nb_subtract(n1,
+                                                   long_as_number.nb_multiply(n2, n3));
+        printf(">>> 50 - 5*6 \n%d\n", PyLong_AsLong(res));
+
+        PyObject *n4 = PyLong_FromLong(4);
+        PyObject *res2 = long_as_number.nb_true_divide(res, n4);
+        printf(">>> (50 - 5*6) / 4 \n%f\n", PyFloat_AsDouble(res2));
+
+        PyObject *n5 = PyLong_FromLong(8);
+        PyObject *n6 = PyLong_FromLong(5);
+        PyObject *res3 = long_as_number.nb_true_divide(n5, n6);
+        printf(">>> 8 / 5 \n%f\n", PyFloat_AsDouble(res3));
+    }
+
+    {
+        PyObject *n1 = PyLong_FromLong(17);
+        PyObject *n2 = PyLong_FromLong(3);
+        PyObject *res1 = long_as_number.nb_true_divide(n1, n2);
+        printf(">>> 17 / 3 \n%f\n", PyFloat_AsDouble(res1));
+
+        PyObject *res2 = long_as_number.nb_floor_divide(n1, n2);
+        printf(">>> 17 // 3 \n%d\n", PyLong_AsLong(res2));
+
+        PyObject *res3 = long_as_number.nb_remainder(n1, n2);
+        printf(">>> 17 % 3 \n%d\n", PyLong_AsLong(res3));
+
+        // 5 * 3 + 2
+    }
+
+    {
+        PyObject *n1 = PyLong_FromLong(5);
+        PyObject *n2 = PyLong_FromLong(2);
+        PyObject *n3 = PyLong_FromLong(7);
+
+        PyObject *res1 = long_as_number.nb_power(n1, n2, Py_None);
+        PyObject *res2 = long_as_number.nb_power(n2, n3, Py_None);
+
+        printf(">>> 5 ** 2 \n%d\n", PyLong_AsLong(res1));
+        printf(">>> 2 ** 7 \n%d\n", PyLong_AsLong(res2));
+    }
+
+    {
+        PyObject *n1 = PyFloat_FromDouble(3);
+        PyObject *n2 = PyFloat_FromDouble(3.75);
+        PyObject *n3 = PyFloat_FromDouble(1.5);
+        PyObject *res = float_as_number.nb_true_divide(float_as_number.nb_multiply(n1, n2),
+                                                        n3);
+        printf(">>> 3 * 3.75 / 1.5 \n%f\n", PyFloat_AsDouble(res));
+    }
+
+    {
+        PyObject *n1 = PyFloat_FromDouble(7.0);
+        PyObject *n2 = PyFloat_FromDouble(2);
+        PyObject *res = float_as_number.nb_true_divide(n1, n2);
+        printf(">>> 7.0 / 2 \n%f\n", PyFloat_AsDouble(res));
+    }
+
     return 0;
 }
 
